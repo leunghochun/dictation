@@ -19,17 +19,21 @@ const Speech = () => {
     const [progress, setProgress] = React.useState(0);
     const [selectedGroup, setSelectedGroup] = React.useState("");
     const [timers, setTimers] = React.useState([]);
+    const voiceNames = ['Samantha', 'Aaron', 'Daniel (English (United Kingdom))'];
 
     const getVoices = () => {
         let list = [];
         voices.forEach((voice, index) => {
-            if (voice.lang === "en-US" && list.length < 3) {
+            console.log(voice, index);
+            if (voiceNames.includes(voice.name)){
+            // if (voice.lang === "en-US" || voice.lang === "en-GB") {
                 list.push({ name: voice.name, value: index})
             }
-        })
+        });
         return list;
     }
     const voiceList = getVoices();
+    // console.log(voices.filter((voice) => voice.lang === "en-US"));
 
     const start = async (batch) => {
         let wordsToBeTested = Object.keys(wordList[batch]);
@@ -37,6 +41,7 @@ const Speech = () => {
             timers.push(setTimeout(() => {
                     for(let j = 0; j<repeatTime; j++) {
                         setTimeout(() => {
+                            // speak({ text: key });
                             speak({ text: key, voice: voices[voice]});
                             console.log("speak: " + key + " " + new Date().toLocaleTimeString());
                         }, 2000 * j);
@@ -126,11 +131,14 @@ const Speech = () => {
                     <Form.Label>Number of words({numberOfWord})</Form.Label>
                     <Form.Range value={numberOfWord} onChange={numberOfWordSliderChange} min="5" max="30" step="5" />
                     <Form.Label>Voice</Form.Label>
+                    
                     {voiceList.map((item) => {
-                            return <Form.Check key={"voice" + item.name + item.value} value={item.value} type="radio" label={item.name} onChange={() => voiceChanged(item.value)} checked={item.value === voice} />
+                        return <div className="flexLayout">
+                                <Form.Check key={"voice" + item.name + item.value} value={item.value} type="radio" label={item.name} onChange={() => voiceChanged(item.value)} checked={item.value === voice} />
+                                <Button className="linkButton" variant="link" onClick={() => { speak({text: item.name, voice: voices[item.value] }) }}>Test</Button>
+                            </div>
                         })
                     }
-                    {voice}
                 </Accordion.Body> 
             </Accordion.Item>
             <Accordion.Item eventKey="1">

@@ -18,6 +18,11 @@
 	float: right;
 }
 
+.linkButton {
+	padding: 0px !important;
+	margin-left: 2vw;
+}
+
 .stat{
 	text-align: left;
 }
@@ -25,4 +30,8 @@
 .word-tested {
 	color: yellow;
 	font-weight: bold;
+}
+
+.flexLayout {
+	display: flex;
 }
