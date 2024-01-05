@@ -25,8 +25,8 @@ const Speech = () => {
         let list = [];
         voices.forEach((voice, index) => {
             console.log(voice, index);
-            if (voiceNames.includes(voice.name)){
-            // if (voice.lang === "en-US" || voice.lang === "en-GB") {
+            // if (voiceNames.includes(voice.name)){
+            if (voice.lang === "en-US" || voice.lang === "en-GB") {
                 list.push({ name: voice.name, value: index})
             }
         });
