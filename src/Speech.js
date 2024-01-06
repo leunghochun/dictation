@@ -3,7 +3,8 @@ import { useSpeechSynthesis } from "react-speech-kit";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Accordion from 'react-bootstrap/Accordion';
-import ProgressBar from 'react-bootstrap/ProgressBar';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 import ListGroup from 'react-bootstrap/ListGroup';
 import wordsJSON from "./words.json";
 
@@ -12,20 +13,18 @@ const Speech = () => {
     const [voice, setVoice] = React.useState(0);
     const [wordData, setWordData] = React.useState(wordsJSON);
     const [wordList, setWordList] = React.useState({});
-    const [wordTested, setWordTested] = React.useState([]);
+    const [wordTested, setWordTested] = React.useState({});
     const [waitTime, setWaitTime] = React.useState(10);
     const [repeatTime, setRepeatTime] = React.useState(2);
     const [numberOfWord, setNumberOfWord] = React.useState(20);
-    const [progress, setProgress] = React.useState(0);
     const [selectedGroup, setSelectedGroup] = React.useState("");
     const [timers, setTimers] = React.useState([]);
     const voiceNames = ['Samantha', 'Aaron', 'Daniel (English (United Kingdom))'];
+    const speakSleep = 3000;
 
     const getVoices = () => {
         let list = [];
         voices.forEach((voice, index) => {
-            console.log(voice, index);
-            // if (voiceNames.includes(voice.name)){
             if (voice.lang === "en-US" || voice.lang === "en-GB") {
                 list.push({ name: voice.name, value: index})
             }
@@ -33,28 +32,24 @@ const Speech = () => {
         return list;
     }
     const voiceList = getVoices();
-    // console.log(voices.filter((voice) => voice.lang === "en-US"));
 
-    const start = async (batch) => {
-        let wordsToBeTested = Object.keys(wordList[batch]);
+    const start = async (year, batch) => {
+        stop();
+        let wordsToBeTested = wordList[year]["words"][batch].filter((word) => !wordTested[word]);
         wordsToBeTested.map(async (key, i) => {
             timers.push(setTimeout(() => {
                     for(let j = 0; j<repeatTime; j++) {
                         setTimeout(() => {
-                            // speak({ text: key });
                             speak({ text: key, voice: voices[voice]});
-                            console.log("speak: " + key + " " + new Date().toLocaleTimeString());
-                        }, 2000 * j);
+                        }, speakSleep * j);
                     }
-                    wordTested.push(key);
-                    wordList[batch][key] = true;
+                    wordTested[key] = true;
                 }, waitTime * 1000 * i)
             );
         })
     }
 
     const stop = () => {
-       setProgress(0);
        timers.forEach(timer => {clearTimeout(timer)});
     }
     
@@ -86,31 +81,22 @@ const Speech = () => {
         if (!data) return;
         setWordList((oldWordList) => {
                 let newWordList = {};
-                let isNew = Object.keys(oldWordList).length === 0;
-                // oldWordList = {};
                 for (let year in data) {
                     let array = [...data[year].words].sort(() => Math.random() - 0.5);
                     let i = 1;
+                    newWordList[year] = { "year" : year };
+                    newWordList[year] = { "words" : {} };
                     while (array.length > 0) {
                         let key = i.toString();
-                        newWordList[year + "Batch" + key] = {};
                         let batch = array.splice(0, numberOfWord);
+                        newWordList[year]["words"]["Batch" + key] = [];
                         batch.forEach((word) => {
-                            newWordList[year + "Batch" + key][word] = wordTested.includes(word);
+                            newWordList[year]["words"]["Batch" + key].push(word);
                         })
-                        //     if (isNew || !oldWordList[year + "Batch" + key][word]) {
-                        //     }
-                        // });
-
-                        // array.splice(0, numberOfWord).forEach((word) => {
-                        //     if (isNew || !oldWordList[year + "Batch" + key][word]) {
-                        //         newWordList[year + "Batch" + key][word] = wordTested.includes(word);
-                        //     }
-                        // });
                         i++;
                     }
                 }
-                setSelectedGroup(Object.keys(newWordList)[0]);
+                setSelectedGroup(Object.keys(newWordList[Object.keys(newWordList)[0]]["words"])[0]);
                 console.log(newWordList);
                 return newWordList;
         });
@@ -125,7 +111,7 @@ const Speech = () => {
                 <Accordion.Header>Settings</Accordion.Header>
                 <Accordion.Body>
                     <Form.Label>Wait time ({waitTime} seconds)</Form.Label>
-                    <Form.Range value={waitTime} onChange={waitTimeSliderChange} min="5" max="30" />
+                    <Form.Range value={waitTime} onChange={waitTimeSliderChange} min={repeatTime * (speakSleep / 1000) } max="30" />
                     <Form.Label>Repeat ({repeatTime} X)</Form.Label>
                     <Form.Range value={repeatTime} onChange={repeatSliderChange} min="1" max="3" />
                     <Form.Label>Number of words({numberOfWord})</Form.Label>
@@ -133,9 +119,9 @@ const Speech = () => {
                     <Form.Label>Voice</Form.Label>
                     
                     {voiceList.map((item) => {
-                        return <div className="flexLayout">
+                        return <div key={ "div" + item.name + item.value } className="flexLayout">
                                 <Form.Check key={"voice" + item.name + item.value} value={item.value} type="radio" label={item.name} onChange={() => voiceChanged(item.value)} checked={item.value === voice} />
-                                <Button className="linkButton" variant="link" onClick={() => { speak({text: item.name, voice: voices[item.value] }) }}>Test</Button>
+                                <Button key={"button" + item.name +item.value} className="linkButton" variant="link" onClick={() => { speak({text: item.name, voice: voices[item.value] }) }}>Test</Button>
                             </div>
                         })
                     }
@@ -144,31 +130,29 @@ const Speech = () => {
             <Accordion.Item eventKey="1">
                 <Accordion.Header>Batches</Accordion.Header>
                 <Accordion.Body>
-                    <ListGroup activeKey={"#" + selectedGroup}>
-                        {Object.keys(wordList).map((batch) => {
-                            return (
-                                <ListGroup.Item key={batch} action href={"#" + batch} onClick={() => batchSelected(batch)}>
-                                    {Object.keys(wordList[batch]).map((word) => {
-                                        return <Form.Label className={wordList[batch][word] ? "word word-tested": "word"} key={word} >{word} </Form.Label>
-                                    })}
-                                    <br/>
-                                    <Button className="button bg-info" onClick={() => start(batch)}> Start </Button>
-                                </ListGroup.Item>
-                            )
+                    <Tabs key="tabs">
+                        {Object.keys(wordList).map((year) => {
+                            return <Tab key={"tab_" + year} eventKey={year} title={wordData[year].name}>
+                                <ListGroup key={"group_" + year} activeKey={"#" + selectedGroup}>
+                                    {
+                                        Object.keys(wordList[year]["words"]).map((batch) => {
+                                        return (
+                                            <ListGroup.Item key={batch} action href={"#" + batch} onClick={() => batchSelected(batch)}>
+                                                {
+                                                    wordList[year]["words"][batch].map((word) => {
+                                                        return <Form.Label className={wordTested[word] ? "word word-tested": "word"} key={word} >{word}</Form.Label>
+                                                    })
+                                                }
+                                                <br/>
+                                                <Button className="button bg-info" disabled={selectedGroup !== batch} onClick={() => start(year, batch)}> Start </Button>
+                                            </ListGroup.Item>
+                                            )
+                                        })
+                                    }
+                                </ListGroup>
+                            </Tab>
                         })}
-                    </ListGroup>
-                </Accordion.Body> 
-            </Accordion.Item>
-            <Accordion.Item eventKey="2">
-                <Accordion.Header>Words</Accordion.Header>
-                <Accordion.Body>
-                    <div className="flex-container">
-                        {Object.keys(wordList).map((word) => printWord(word))}
-                        <div className="flex-full-width">
-                            <Button className="button" onClick={() => start()}> Start </Button>
-                            <Button className="button" onClick={() => stop()}> Stop </Button>
-                        </div>
-                    </div>
+                    </Tabs>
                 </Accordion.Body> 
             </Accordion.Item>
         </Accordion>
