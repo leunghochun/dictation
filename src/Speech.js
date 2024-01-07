@@ -10,6 +10,7 @@ import wordsJSON from "./words.json";
 
 const Speech = () => {
     const { speak, voices } = useSpeechSynthesis();
+    const [settings, setSettings] = React.useState({});
     const [voice, setVoice] = React.useState(0);
     const [wordData, setWordData] = React.useState(wordsJSON);
     const [wordList, setWordList] = React.useState({});
@@ -21,6 +22,16 @@ const Speech = () => {
     const [timers, setTimers] = React.useState([]);
     const voiceNames = ['Samantha', 'Aaron', 'Daniel (English (United Kingdom))'];
     const speakSleep = 3000;
+    
+    const getMinWaitTime = () => {
+        return (repeatTime * speakSleep + speakSleep) / 1000;
+    }
+    
+    const saveSettings = () => {
+        localStorage.setItem('settings', JSON.stringify(settings));
+    } 
+
+    const [minWaitTime, setMinWaitTime] = React.useState(getMinWaitTime());
 
     const getVoices = () => {
         let list = [];
@@ -55,26 +66,36 @@ const Speech = () => {
     
     const waitTimeSliderChange = (e) => {
         setWaitTime(e.target.value);
+        settings["waitTime"] = e.target.value;
+        saveSettings();
     };
 
     const repeatSliderChange = (e) => {
         setRepeatTime(e.target.value);
+        let min = getMinWaitTime();
+        if (waitTime > min) {
+            setMinWaitTime(min);
+        }
+        settings["repeatTime"] = e.target.value;
+        saveSettings();
     };
     
     const numberOfWordSliderChange = (e) => {
         setNumberOfWord(e.target.value);
+        settings["numberOfWord"] = e.target.value;
+        saveSettings();
     }
     
-    const printWord = (word) => {
-        return <Form.Label className="word" key={word}>{wordList[word] ? word: ""}</Form.Label> 
-    }
-
     const batchSelected = (batch) => {
         setSelectedGroup(batch);
+        settings["selectedGroup"] = batch;
+        saveSettings();
     }
 
     const voiceChanged = (selectedVoice) => {
         setVoice(selectedVoice);
+        settings["voice"] = selectedVoice;
+        saveSettings();
     }
 
     const generateWordList = (data) => {
@@ -105,13 +126,30 @@ const Speech = () => {
         generateWordList(wordData);
     }, [wordData, numberOfWord])
 
+    useEffect(() => {
+        const settings = JSON.parse(localStorage.getItem("settings"));
+        if (settings) {
+            setSettings(settings);
+        }
+    }, []);
+
+    useEffect(() => {
+        console.log(settings);
+        if (Object.keys(settings).length > 0) {
+            if (settings["waitTime"]) setWaitTime(settings["waitTime"]);
+            if (settings["numberOfWord"]) setNumberOfWord(settings["numberOfWord"]);
+            if (settings["repeatTime"]) setRepeatTime(settings["repeatTime"]);
+            if (settings["voice"]) setVoice(settings["voice"]);
+        }
+    }, [settings])
+
     return (        
         <Accordion defaultActiveKey={['1']} alwaysOpen>
             <Accordion.Item eventKey="0">
                 <Accordion.Header>Settings</Accordion.Header>
                 <Accordion.Body>
                     <Form.Label>Wait time ({waitTime} seconds)</Form.Label>
-                    <Form.Range value={waitTime} onChange={waitTimeSliderChange} min={repeatTime * (speakSleep / 1000) } max="30" />
+                    <Form.Range value={waitTime} onChange={waitTimeSliderChange} min={minWaitTime} max="30" />
                     <Form.Label>Repeat ({repeatTime} X)</Form.Label>
                     <Form.Range value={repeatTime} onChange={repeatSliderChange} min="1" max="3" />
                     <Form.Label>Number of words({numberOfWord})</Form.Label>
@@ -144,7 +182,12 @@ const Speech = () => {
                                                     })
                                                 }
                                                 <br/>
-                                                <Button className="button bg-info" disabled={selectedGroup !== batch} onClick={() => start(year, batch)}> Start </Button>
+                                                {
+                                                    selectedGroup === batch ?    
+                                                    <Button className="button bg-info" onClick={() => start(year, batch)}> Start </Button> 
+                                                    :
+                                                    <></>
+                                                }
                                             </ListGroup.Item>
                                             )
                                         })
