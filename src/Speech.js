@@ -137,7 +137,7 @@ const Speech = () => {
     const videoConstraints = {
         width: { min: 480 },
         height: { min: 720 },
-        facingMode: "user",
+        facingMode: "environment",
     };
 
     const tryORC = () => {
