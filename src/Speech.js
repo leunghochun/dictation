@@ -240,7 +240,7 @@ const Speech = () => {
                         <>
                         <Webcam
                             audio={false}
-                            mirrored={true}
+                            mirrored={false}
                             height={400}
                             width={400}
                             ref={webcamRef}
