@@ -135,8 +135,8 @@ const Speech = () => {
     }
 
     const videoConstraints = {
-        width: { min: 480 },
-        height: { min: 720 },
+        width: { min: 1920},
+        height: { min: 1080},
         facingMode: "environment",
     };
 
