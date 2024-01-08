@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useSpeechSynthesis } from "react-speech-kit";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -6,7 +6,9 @@ import Accordion from 'react-bootstrap/Accordion';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import ListGroup from 'react-bootstrap/ListGroup';
+import Webcam from "react-webcam";
 import wordsJSON from "./words.json";
+import Tesseract from "tesseract.js";
 
 const Speech = () => {
     const { speak, voices } = useSpeechSynthesis();
@@ -20,6 +22,15 @@ const Speech = () => {
     const [numberOfWord, setNumberOfWord] = React.useState(20);
     const [selectedGroup, setSelectedGroup] = React.useState("");
     const [timers, setTimers] = React.useState([]);
+    const webcamRef = useRef(null);
+    const [img, setImg] = React.useState(null);
+    const [text, setText] = React.useState(null);
+
+    const capture = useCallback(() => {
+        const imageSrc = webcamRef.current.getScreenshot();
+        setImg(imageSrc);
+      }, [webcamRef]);
+
     const voiceNames = ['Samantha', 'Aaron', 'Daniel (English (United Kingdom))'];
     const speakSleep = 3000;
     
@@ -122,6 +133,29 @@ const Speech = () => {
                 return newWordList;
         });
     }
+
+    const videoConstraints = {
+        width: { min: 480 },
+        height: { min: 720 },
+        facingMode: "user",
+    };
+
+    const tryORC = () => {
+        console.log("Start OCR");
+        // const imageSrc = this.webcamRef.current.getScreenshot();
+        if (!img) return;
+        Tesseract.recognize(img, "eng", {
+          logger: (m) => console.log(m.progress)
+        }).then(({ data: { text } }) => {
+          // console.log(text);
+          setText(text);
+        });
+    };
+
+    useEffect(() => {
+        tryORC();
+    }, [img])
+
     useEffect(() => {
         generateWordList(wordData);
     }, [wordData, numberOfWord])
@@ -197,6 +231,33 @@ const Speech = () => {
                         })}
                     </Tabs>
                 </Accordion.Body> 
+            </Accordion.Item>
+            <Accordion.Item eventKey="3">
+                <Accordion.Header>Capture</Accordion.Header>
+                <Accordion.Body>
+                <div className="Container">
+                    {img === null ? (
+                        <>
+                        <Webcam
+                            audio={false}
+                            mirrored={true}
+                            height={400}
+                            width={400}
+                            ref={webcamRef}
+                            screenshotFormat="image/jpeg"
+                            videoConstraints={videoConstraints}
+                        />
+                        <Button onClick={capture}>Capture photo</Button>
+                        </>
+                    ) : (
+                        <>
+                        <img src={img} alt="screenshot" />
+                        <Button onClick={() => setImg(null)}>Retake</Button>
+                        </>
+                    )}
+                    {text}
+                </div>
+                </Accordion.Body>
             </Accordion.Item>
         </Accordion>
     );
