@@ -9,6 +9,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Webcam from "react-webcam";
 import wordsJSON from "./words.json";
 import Tesseract from "tesseract.js";
+import SpellBatch from "./components/SpellBatch";
 
 const Speech = () => {
     const { speak, voices } = useSpeechSynthesis();
@@ -25,6 +26,8 @@ const Speech = () => {
     const webcamRef = useRef(null);
     const [img, setImg] = React.useState(null);
     const [text, setText] = React.useState(null);
+    const [, updateState] = React.useState();
+    const forceUpdate = React.useCallback(() => updateState({}), []);
 
     const capture = useCallback(() => {
         const imageSrc = webcamRef.current.getScreenshot();
@@ -152,6 +155,13 @@ const Speech = () => {
         });
     };
 
+    const setCorrectWord = async (word, isCorrect) => {
+        if (word) {
+            wordTested[word] = isCorrect;
+            forceUpdate();
+        }
+    };
+
     useEffect(() => {
         tryORC();
     }, [img])
@@ -209,16 +219,22 @@ const Speech = () => {
                                     {
                                         Object.keys(wordList[year]["words"]).map((batch) => {
                                         return (
-                                            <ListGroup.Item key={batch} action href={"#" + batch} onClick={() => batchSelected(batch)}>
+                                            <ListGroup.Item key={year + batch} action href={"#" + year + batch} onClick={() => batchSelected(year + batch)}>
                                                 {
                                                     wordList[year]["words"][batch].map((word) => {
-                                                        return <Form.Label className={wordTested[word] ? "word word-tested": "word"} key={word} >{word}</Form.Label>
+                                                        return <Form.Label className={wordTested[word] ? "word word-tested": "word"} key={word}>{word}</Form.Label>
                                                     })
                                                 }
                                                 <br/>
                                                 {
-                                                    selectedGroup === batch ?    
-                                                    <Button className="button bg-info" onClick={() => start(year, batch)}> Start </Button> 
+                                                    Object.keys(wordTested).length
+                                                }
+                                                {
+                                                    selectedGroup === year + batch ?    
+                                                    <>
+                                                        {/* <Button className="button bg-info" onClick={() => start(year, batch)}> Start</Button>  */}
+                                                        <SpellBatch words={wordList[year]["words"][batch]} voice={voice} settings={settings} setCorrectWord={setCorrectWord}/>
+                                                    </>
                                                     :
                                                     <></>
                                                 }
