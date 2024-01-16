@@ -58,21 +58,21 @@ const Speech = () => {
     }
     const voiceList = getVoices();
 
-    const start = async (year, batch) => {
-        stop();
-        let wordsToBeTested = wordList[year]["words"][batch].filter((word) => !wordTested[word]);
-        wordsToBeTested.map(async (key, i) => {
-            timers.push(setTimeout(() => {
-                    for(let j = 0; j<repeatTime; j++) {
-                        setTimeout(() => {
-                            speak({ text: key, voice: voices[voice]});
-                        }, speakSleep * j);
-                    }
-                    wordTested[key] = true;
-                }, waitTime * 1000 * i)
-            );
-        })
-    }
+    // const start = async (year, batch) => {
+    //     stop();
+    //     let wordsToBeTested = wordList[year]["words"][batch].filter((word) => !wordTested[word]);
+    //     wordsToBeTested.map(async (key, i) => {
+    //         timers.push(setTimeout(() => {
+    //                 for(let j = 0; j<repeatTime; j++) {
+    //                     setTimeout(() => {
+    //                         speak({ text: key, voice: voices[voice]});
+    //                     }, speakSleep * j);
+    //                 }
+    //                 wordTested[key] = true;
+    //             }, waitTime * 1000 * i)
+    //         );
+    //     })
+    // }
 
     const stop = () => {
        timers.forEach(timer => {clearTimeout(timer)});
@@ -171,9 +171,9 @@ const Speech = () => {
     }, [wordData, numberOfWord])
 
     useEffect(() => {
-        const settings = JSON.parse(localStorage.getItem("settings"));
-        if (settings) {
-            setSettings(settings);
+        const localSettings = JSON.parse(localStorage.getItem("settings"));
+        if (localSettings) {
+            setSettings(localSettings);
         }
     }, []);
 
@@ -184,6 +184,12 @@ const Speech = () => {
             if (settings["numberOfWord"]) setNumberOfWord(settings["numberOfWord"]);
             if (settings["repeatTime"]) setRepeatTime(settings["repeatTime"]);
             if (settings["voice"]) setVoice(settings["voice"]);
+        } else {
+            settings["waitTime"] = waitTime;
+            settings["numberOfWord"] = numberOfWord;
+            settings["repeatTime"] = repeatTime;
+            settings["voice"] = voice;
+            saveSettings();
         }
     }, [settings])
 
