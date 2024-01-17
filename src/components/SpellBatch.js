@@ -39,15 +39,15 @@ const SpellBatch = (props) => {
     };
 
     React.useEffect(() => {
-        console.log("index:", index);
         if (index < 0) return;
         speakWord(index);
+        setCounter(-1);
+        setProgressBarColor("progress-bar-green");
+        setCountOfProgess(0);
     }, [index]);
 
     const ReloadMessage = () => {
-        console.log("reload Message");
         setCountOfProgess((oldProgress) => {
-            console.log("timer");
             if (!started) return 0;
             if (counter === props.settings.waitTime) {
                 setCounter(-1);
@@ -59,8 +59,9 @@ const SpellBatch = (props) => {
             let progress = counter/ props.settings.waitTime * 100;
             if (progress >= 50) {
                 setProgressBarColor(progress >= 75 ? "progress-bar-red" : "progress-bar-yellow");
+            } else {
+                setProgressBarColor("progress-bar-green");
             }
-            console.log("counter:", counter, ",", progress);
             return counter/ props.settings.waitTime * 100;
         });
     };
@@ -72,7 +73,6 @@ const SpellBatch = (props) => {
             clearInterval(tid);
         };
     }, [started, counter]);
-
 
     return (
         <>
