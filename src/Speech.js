@@ -15,6 +15,7 @@ const Speech = () => {
     const { speak, voices } = useSpeechSynthesis();
     const [settings, setSettings] = React.useState({});
     const [voice, setVoice] = React.useState(0);
+    const [rate, setRate] = React.useState(1);
     const [wordData, setWordData] = React.useState(wordsJSON);
     const [wordList, setWordList] = React.useState({});
     const [wordTested, setWordTested] = React.useState({});
@@ -58,26 +59,12 @@ const Speech = () => {
     }
     const voiceList = getVoices();
 
-    // const start = async (year, batch) => {
-    //     stop();
-    //     let wordsToBeTested = wordList[year]["words"][batch].filter((word) => !wordTested[word]);
-    //     wordsToBeTested.map(async (key, i) => {
-    //         timers.push(setTimeout(() => {
-    //                 for(let j = 0; j<repeatTime; j++) {
-    //                     setTimeout(() => {
-    //                         speak({ text: key, voice: voices[voice]});
-    //                     }, speakSleep * j);
-    //                 }
-    //                 wordTested[key] = true;
-    //             }, waitTime * 1000 * i)
-    //         );
-    //     })
-    // }
+    const rateSliderChange = (e) => {
+        setRate(e.target.value);
+        settings["rate"] = e.target.value;
+        saveSettings();
+    };
 
-    const stop = () => {
-       timers.forEach(timer => {clearTimeout(timer)});
-    }
-    
     const waitTimeSliderChange = (e) => {
         setWaitTime(e.target.value);
         settings["waitTime"] = e.target.value;
@@ -198,6 +185,8 @@ const Speech = () => {
             <Accordion.Item eventKey="0">
                 <Accordion.Header>Settings</Accordion.Header>
                 <Accordion.Body>
+                    <Form.Label>Speed </Form.Label>
+                    <Form.Range value={rate} onChange={rateSliderChange} min="0.5" max="2" step="0.1" />
                     <Form.Label>Wait time ({waitTime} seconds)</Form.Label>
                     <Form.Range value={waitTime} onChange={waitTimeSliderChange} min={minWaitTime} max="30" />
                     <Form.Label>Repeat ({repeatTime} X)</Form.Label>
