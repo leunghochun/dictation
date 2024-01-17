@@ -24,6 +24,7 @@ const SpellTest = (props) => {
     React.useEffect(()=> {
         if (props.word) {
             props.setCorrectWord(props.word, isCorrect);
+            setWord("");
         }
     },[isCorrect]);
 
