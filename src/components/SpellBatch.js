@@ -1,8 +1,10 @@
 import React from "react";
-import Button from 'react-bootstrap/Button';
 import { useSpeechSynthesis } from "react-speech-kit";
 import SpellTest from "./SpellTest";
+import { Form } from "react-bootstrap";
 import ProgressBar from 'react-bootstrap/ProgressBar';
+import Button from 'react-bootstrap/Button';
+import { propTypes } from "react-bootstrap/esm/Image";
 
 const SpellBatch = (props) => {
     const { speak, voices } = useSpeechSynthesis();
@@ -13,6 +15,7 @@ const SpellBatch = (props) => {
     const [ progressBarColor, setProgressBarColor] = React.useState("progress-bar-green");
     const [ countOfProgess, setCountOfProgess ] = React.useState(0);
     const [ counter, setCounter ] = React.useState(0);
+    const [ correctWords, setCorrectWords ] = React.useState([]);
     const speakSleep = 3000;
 
     const speakWord = (index) => {
@@ -36,6 +39,12 @@ const SpellBatch = (props) => {
             setIndex(0);
         }
         setStarted(isStarted);
+    };
+
+    const setCorrectWord = (word, isCorrect) => {
+        props.setCorrectWord(word, isCorrect);
+        if (isCorrect && !correctWords.includes(word))
+            correctWords.push(word);
     };
 
     React.useEffect(() => {
@@ -74,13 +83,27 @@ const SpellBatch = (props) => {
         };
     }, [started, counter]);
 
+    React.useEffect(() => {
+        console.log("started:", started, props.year, props.batch);
+        props.setYearStarted(props.year, props.batch, started);
+    }, [started]);
+
+    React.useEffect(() => {
+       setCorrectWord([]);
+    }, [props.words]);
+
     return (
         <>
             {   
                 started ?
                     <>
+                        {
+                            correctWords.map((word) => {
+                                return <Form.Label className="word-tested word" key={word}>{word}</Form.Label> 
+                            })
+                        }
                         <ProgressBar className={progressBarColor} now={countOfProgess} />
-                        <SpellTest word={props.words[index]} voice={props.voice} settings={props.settings} setCorrectWord={props.setCorrectWord}/>
+                        <SpellTest word={props.words[index]} voice={props.voice} settings={props.settings} setCorrectWord={setCorrectWord}/>
                         <Button className="button bg-info"  onClick={() => {startClicked(false)}}>Stop</Button>
                         <Button className="button bg-info"  onClick={() => setIndex((prevIndex) => prevIndex + 1)}>Next</Button> 
                     </>

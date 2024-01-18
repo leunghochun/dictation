@@ -11,7 +11,7 @@ const SpellTest = (props) => {
         let isCorrect = true;
         setWord(text);
         for (let i = 0; i < text.length; i++) {
-            if (text[i] === props.word[i])
+            if (text[i].toLowerCase() === props.word[i].toLowerCase())
                 correctChars.push(text[i]);
             else {
                 isCorrect = false;

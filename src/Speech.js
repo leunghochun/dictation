@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from "react";
-import { useSpeechSynthesis } from "react-speech-kit";
+import { useSpeechSynthesis }from "react-speech-kit";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Accordion from 'react-bootstrap/Accordion';
@@ -15,6 +15,7 @@ const Speech = () => {
     const { speak, voices } = useSpeechSynthesis();
     const [settings, setSettings] = React.useState({});
     const [voice, setVoice] = React.useState(0);
+    const [enabledWebCam, setEnabledWebCam] = React.useState(false);
     const [rate, setRate] = React.useState(1);
     const [wordData, setWordData] = React.useState(wordsJSON);
     const [wordList, setWordList] = React.useState({});
@@ -23,7 +24,6 @@ const Speech = () => {
     const [repeatTime, setRepeatTime] = React.useState(2);
     const [numberOfWord, setNumberOfWord] = React.useState(20);
     const [selectedGroup, setSelectedGroup] = React.useState("");
-    const [timers, setTimers] = React.useState([]);
     const webcamRef = useRef(null);
     const [img, setImg] = React.useState(null);
     const [text, setText] = React.useState(null);
@@ -106,8 +106,7 @@ const Speech = () => {
                 for (let year in data) {
                     let array = [...data[year].words].sort(() => Math.random() - 0.5);
                     let i = 1;
-                    newWordList[year] = { "year" : year };
-                    newWordList[year] = { "words" : {} };
+                    newWordList[year] = { "words" : {}, "year": year, "started": false, batch: "" };
                     while (array.length > 0) {
                         let key = i.toString();
                         let batch = array.splice(0, numberOfWord);
@@ -149,6 +148,16 @@ const Speech = () => {
         }
     };
 
+    const setYearStarted = (year, batch, started) => {
+        if (wordList) {
+            if (started)
+                wordList[year]["batch"] = batch;
+            else
+                wordList[year]["batch"] = "";
+            forceUpdate();
+        }
+    };
+
     useEffect(() => {
         tryORC();
     }, [img])
@@ -180,8 +189,12 @@ const Speech = () => {
         }
     }, [settings])
 
+    const onActiveKeyChange = (e) => {
+        setEnabledWebCam(e.includes("2"));
+    }
+
     return (        
-        <Accordion defaultActiveKey={['1']} alwaysOpen>
+        <Accordion defaultActiveKey={['1']} alwaysOpen onSelect={(e) => onActiveKeyChange(e)}>
             <Accordion.Item eventKey="0">
                 <Accordion.Header>Settings</Accordion.Header>
                 <Accordion.Body>
@@ -216,19 +229,24 @@ const Speech = () => {
                                         return (
                                             <ListGroup.Item key={year + batch} action href={"#" + year + batch} onClick={() => batchSelected(year + batch)}>
                                                 {
+                                                    wordList[year].batch !== batch ?
                                                     wordList[year]["words"][batch].map((word) => {
                                                         return <Form.Label className={wordTested[word] ? "word word-tested": "word"} key={word}>{word}</Form.Label>
                                                     })
+                                                    : <></>
                                                 }
                                                 <br/>
                                                 {
-                                                    Object.keys(wordTested).length
-                                                }
-                                                {
                                                     selectedGroup === year + batch ?    
                                                     <>
-                                                        {/* <Button className="button bg-info" onClick={() => start(year, batch)}> Start</Button>  */}
-                                                        <SpellBatch words={wordList[year]["words"][batch]} voice={voice} settings={settings} setCorrectWord={setCorrectWord}/>
+                                                        <SpellBatch words={wordList[year]["words"][batch]} 
+                                                                    voice={voice} 
+                                                                    settings={settings}
+                                                                    setCorrectWord={setCorrectWord} 
+                                                                    setYearStarted={setYearStarted}
+                                                                    year={year}
+                                                                    batch={batch}
+                                                                    />
                                                     </>
                                                     :
                                                     <></>
@@ -243,31 +261,35 @@ const Speech = () => {
                     </Tabs>
                 </Accordion.Body> 
             </Accordion.Item>
-            <Accordion.Item eventKey="3">
+            <Accordion.Item eventKey="2">
                 <Accordion.Header>Capture</Accordion.Header>
                 <Accordion.Body>
-                <div className="Container">
-                    {img === null ? (
-                        <>
-                        <Webcam
-                            audio={false}
-                            mirrored={false}
-                            height={400}
-                            width={400}
-                            ref={webcamRef}
-                            screenshotFormat="image/jpeg"
-                            videoConstraints={videoConstraints}
-                        />
-                        <Button onClick={capture}>Capture photo</Button>
-                        </>
-                    ) : (
-                        <>
-                        <img src={img} alt="screenshot" />
-                        <Button onClick={() => setImg(null)}>Retake</Button>
-                        </>
-                    )}
-                    {text}
-                </div>
+                { enabledWebCam ?
+                    <div className="Container">
+                        {img === null ? (
+                            <>
+                            <Webcam
+                                audio={false}
+                                mirrored={false}
+                                height={400}
+                                width={400}
+                                ref={webcamRef}
+                                screenshotFormat="image/jpeg"
+                                videoConstraints={videoConstraints}
+                            />
+                            <Button onClick={capture}>Capture photo</Button>
+                            </>
+                        ) : (
+                            <>
+                            <img src={img} alt="screenshot" />
+                            <Button onClick={() => setImg(null)}>Retake</Button>
+                            </>
+                        )}
+                        {text}
+                    </div>
+                    :
+                    <></>
+                }
                 </Accordion.Body>
             </Accordion.Item>
         </Accordion>
