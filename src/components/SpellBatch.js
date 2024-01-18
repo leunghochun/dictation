@@ -110,8 +110,6 @@ const SpellBatch = (props) => {
                 : 
                    <Button className="button bg-info"  onClick={() => {startClicked(true)}}>Start</Button>
             }
-            {"index:" + index}
-            {"started:" + started}
         </>
     );
 };
