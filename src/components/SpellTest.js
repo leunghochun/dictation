@@ -44,7 +44,6 @@ const SpellTest = (props) => {
 
     return (
         <>
-            {isCorrect ? props.word : ""}
             <Form.Label className="word-tested word" key={word}>{word}</Form.Label> 
             <Form.Control size="lg" type="text" placeholder="Vocabulary" onKeyUp={inputKeyUp} onChange={inputKeyUp} value={key}/>
         </>
