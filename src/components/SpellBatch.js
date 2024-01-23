@@ -4,7 +4,6 @@ import SpellTest from "./SpellTest";
 import { Form } from "react-bootstrap";
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Button from 'react-bootstrap/Button';
-import { propTypes } from "react-bootstrap/esm/Image";
 
 const SpellBatch = (props) => {
     const { speak, voices } = useSpeechSynthesis();

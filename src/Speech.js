@@ -8,8 +8,8 @@ import Tabs from 'react-bootstrap/Tabs';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Webcam from "react-webcam";
 import wordsJSON from "./words.json";
-import Tesseract from "tesseract.js";
 import SpellBatch from "./components/SpellBatch";
+import Tesseract from "tesseract.js";
 
 const Speech = () => {
     const { speak, voices } = useSpeechSynthesis();

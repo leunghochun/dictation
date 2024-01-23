@@ -7,14 +7,12 @@ const SpellTest = (props) => {
     const [ isCorrect, setIsCorrect ] = React.useState(false);
 
     const inputKeyUp = (event) =>{
-        console.log(event.target.value);
         if (event.keyCode === 8) {
             setWord((word) => word.substring(0, word.length-1));
             return;
         }
         let char = event.target.value;
         let text = word + char;
-        console.log(char, text);
         let correctChars = [];
         let correct = true;
         for (let i = 0; i < text.length; i++) {
