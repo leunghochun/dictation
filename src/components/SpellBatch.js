@@ -43,8 +43,10 @@ const SpellBatch = (props) => {
 
     const setCorrectWord = (word, isCorrect) => {
         props.setCorrectWord(word, isCorrect);
-        if (isCorrect && !correctWords.includes(word))
+        if (isCorrect && !correctWords.includes(word)) {
             correctWords.push(word);
+            setIndex((index) => index + 1);
+        }
     };
 
     React.useEffect(() => {

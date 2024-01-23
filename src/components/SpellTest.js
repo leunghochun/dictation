@@ -27,7 +27,7 @@ const SpellTest = (props) => {
         }
         console.log("correct:", correct, correct && text.length === props.word.length);
         setIsCorrect(correct && text.length === props.word.length);
-        setWord(text);
+        setWord(correctChars.join(""));
         setKey("");
     };
 
