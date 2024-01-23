@@ -50,9 +50,9 @@ const Speech = () => {
 
     const getVoices = () => {
         let list = [];
-        voices.forEach((voice, index) => {
-            if (voice.lang === "en-US" || voice.lang === "en-GB") {
-                list.push({ name: voice.name, value: index})
+        voices.forEach((v, index) => {
+            if (v.lang === "en-US" || v.lang === "en-GB") {
+                list.push({ name: v.name, value: index})
             }
         });
         return list;
@@ -176,10 +176,10 @@ const Speech = () => {
     useEffect(() => {
         console.log(settings);
         if (Object.keys(settings).length > 0) {
-            if (settings["waitTime"]) setWaitTime(settings["waitTime"]);
-            if (settings["numberOfWord"]) setNumberOfWord(settings["numberOfWord"]);
-            if (settings["repeatTime"]) setRepeatTime(settings["repeatTime"]);
-            if (settings["voice"]) setVoice(settings["voice"]);
+            setWaitTime(settings["waitTime"] ? settings["waitTime"] : waitTime);
+            setNumberOfWord(settings["numberOfWord"] ? settings["numberOfWord"] : numberOfWord);
+            setRepeatTime(settings["repeatTime"] ? settings["repeatTime"] : repeatTime);
+            setVoice(settings["voice"] ? settings["voice"] : voice);
         } else {
             settings["waitTime"] = waitTime;
             settings["numberOfWord"] = numberOfWord;
@@ -187,7 +187,7 @@ const Speech = () => {
             settings["voice"] = voice;
             saveSettings();
         }
-    }, [settings])
+    }, [numberOfWord, repeatTime, saveSettings, settings, voice, waitTime])
 
     const onActiveKeyChange = (e) => {
         setEnabledWebCam(e.includes("2"));
