@@ -1,12 +1,12 @@
 import React from "react";
-import { useSpeechSynthesis } from "react-speech-kit";
-import SpellTest from "./SpellTest";
+// import { useSpeechSynthesis } from "react-speech-kit";
 import { Form } from "react-bootstrap";
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Button from 'react-bootstrap/Button';
+import SpellTest from "./SpellTest";
 
 const SpellBatch = (props) => {
-    const { speak, voices } = useSpeechSynthesis();
+    // const { speak, voices } = useSpeechSynthesis();
     const [ index, setIndex ] = React.useState(-1);
     const [ started, setStarted ] = React.useState(false);
     const [ timers, setTimers ] = React.useState([]);
@@ -18,11 +18,11 @@ const SpellBatch = (props) => {
     const speakSleep = 3000;
 
     const speakWord = (index) => {
-        for(let j = 0; j < props.settings.repeatTime; j++) {
-            timers.push(setTimeout(() => {
-                speak({ text: props.words[index], voice: voices[props.settings.voice], rate: props.settings.rate ? props.settings.rate : "1"});
-            }, speakSleep * j));
-        }
+        // for(let j = 0; j < props.settings.repeatTime; j++) {
+        //     timers.push(setTimeout(() => {
+        //         speak({ text: props.words[index], voice: voices[props.settings.voice], rate: props.settings.rate ? props.settings.rate : "1"});
+        //     }, speakSleep * j));
+        // }
     };
 
     const stopSpeakWord = () =>{

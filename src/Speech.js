@@ -7,9 +7,9 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Webcam from "react-webcam";
-import wordsJSON from "./words.json";
-import SpellBatch from "./components/SpellBatch";
 import Tesseract from "tesseract.js";
+import SpellBatch from "./components/SpellBatch";
+import wordsJSON from "./words.json";
 
 const Speech = () => {
     const { speak, voices } = useSpeechSynthesis();
