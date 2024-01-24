@@ -12,9 +12,11 @@ import SpellBatch from "./components/SpellBatch";
 import wordsJSON from "./words.json";
 
 const Speech = () => {
+    const webcamRef = useRef(null);
     const { speak, voices } = useSpeechSynthesis();
+
     const [settings, setSettings] = React.useState({});
-    const [voice, setVoice] = React.useState(0);
+    const [voice, setVoice] = React.useState();
     const [enabledWebCam, setEnabledWebCam] = React.useState(false);
     const [rate, setRate] = React.useState(1);
     const [wordData, setWordData] = React.useState(wordsJSON);
@@ -24,7 +26,6 @@ const Speech = () => {
     const [repeatTime, setRepeatTime] = React.useState(2);
     const [numberOfWord, setNumberOfWord] = React.useState(20);
     const [selectedGroup, setSelectedGroup] = React.useState("");
-    const webcamRef = useRef(null);
     const [img, setImg] = React.useState(null);
     const [text, setText] = React.useState(null);
     const [, updateState] = React.useState();
@@ -162,7 +163,7 @@ const Speech = () => {
         console.log(item);
         // speak({text: item.name, voice: voices[item.value] });
         // speak({text: "testing 123", voice: voices[item.value]});
-        speak({text: "testing 123" });
+        speak({text: item.name });
     }
 
     useEffect(() => {
@@ -246,7 +247,6 @@ const Speech = () => {
                                                     selectedGroup === year + batch ?    
                                                     <>
                                                         <SpellBatch words={wordList[year]["words"][batch]} 
-                                                                    voice={voice} 
                                                                     settings={settings}
                                                                     setCorrectWord={setCorrectWord} 
                                                                     setYearStarted={setYearStarted}

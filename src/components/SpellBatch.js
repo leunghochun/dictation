@@ -20,7 +20,11 @@ const SpellBatch = (props) => {
     const speakWord = (index) => {
         for(let j = 0; j < props.settings.repeatTime; j++) {
             timers.push(setTimeout(() => {
-                speak({ text: props.words[index], voice: voices[props.settings.voice], rate: props.settings.rate ? props.settings.rate : "1"});
+                if (props.settings.voice) {
+                    speak({ text: props.words[index], voice: voices[props.settings.voice], rate: props.settings.rate ? props.settings.rate : "1"});
+                } else {
+                    speak({ text: props.words[index], rate: props.settings.rate ? props.settings.rate : "1"});
+                }
             }, speakSleep * j));
         }
     };
@@ -28,7 +32,12 @@ const SpellBatch = (props) => {
     const stopSpeakWord = () =>{
         timers.forEach(timer => {clearTimeout(timer)});
         clearInterval(progressTimer);
-    }
+    };
+    
+    const nextClicked = () => {
+        stopSpeakWord();
+        setIndex((prevIndex) => prevIndex + 1);
+    };
 
     const startClicked = (isStarted) => {
         if (!isStarted) {
@@ -106,7 +115,7 @@ const SpellBatch = (props) => {
                         <ProgressBar className={progressBarColor} now={countOfProgess} />
                         <SpellTest word={props.words[index]} voice={props.voice} settings={props.settings} setCorrectWord={setCorrectWord}/>
                         <Button className="button bg-info"  onClick={() => {startClicked(false)}}>Stop</Button>
-                        <Button className="button bg-info"  onClick={() => setIndex((prevIndex) => prevIndex + 1)}>Next</Button> 
+                        <Button className="button bg-info"  onClick={() => {nextClicked()}}>Next</Button> 
                     </>
                 : 
                    <Button className="button bg-info"  onClick={() => {startClicked(true)}}>Start</Button>
