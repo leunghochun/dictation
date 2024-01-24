@@ -163,7 +163,12 @@ const Speech = () => {
         console.log(item);
         // speak({text: item.name, voice: voices[item.value] });
         // speak({text: "testing 123", voice: voices[item.value]});
-        speak({text: item.name });
+        // speak({text: "testing 123", voice: voices[item.value]});
+        if (voices[item.value]) {
+            speak({text: "testing 123", voice: voices[item.value]});
+        } else {
+            speak({text: "testing 123"});
+        }
     }
 
     useEffect(() => {
