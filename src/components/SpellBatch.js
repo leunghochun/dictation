@@ -12,7 +12,7 @@ const SpellBatch = (props) => {
     const [ timers, setTimers ] = React.useState([]);
     const [ progressTimer, setProgressTimer ] = React.useState();
     const [ progressBarColor, setProgressBarColor] = React.useState("progress-bar-green");
-    const [ countOfProgess, setCountOfProgess ] = React.useState(0);
+    const [ countOfProgress, setCountOfProgress ] = React.useState(0);
     const [ counter, setCounter ] = React.useState(0);
     const [ correctWords, setCorrectWords ] = React.useState([]);
     const speakSleep = 3000;
@@ -20,12 +20,11 @@ const SpellBatch = (props) => {
     const speakWord = (index) => {
         for(let j = 0; j < props.settings.repeatTime; j++) {
             timers.push(setTimeout(() => {
-                // if (props.settings.voice) {
-                //     speak({ text: props.words[index], voice: voices[props.settings.voice], rate: props.settings.rate ? props.settings.rate : "1"});
-                // } else {
-                //     speak({ text: props.words[index], rate: props.settings.rate ? props.settings.rate : "1"});
-                // }
-                speak({ text: props.words[index], rate: props.settings.rate ? props.settings.rate : "1"});
+                if (props.settings.voice === 0 || props.settings.voice) {
+                    speak({ text: props.words[index], voice: voices[props.settings.voice], rate: props.settings.rate ? props.settings.rate : "1"});
+                } else {
+                    speak({ text: props.words[index], rate: props.settings.rate ? props.settings.rate : "1"});
+                }
             }, speakSleep * j));
         }
     };
@@ -36,8 +35,14 @@ const SpellBatch = (props) => {
     };
     
     const nextClicked = () => {
-        stopSpeakWord();
-        setIndex((prevIndex) => prevIndex + 1);
+        console.log("nextClicked", index);
+        if (index >= props.words.length) {
+            startClicked(false);
+        } else {
+            stopSpeakWord();
+            setIndex((prevIndex) => prevIndex + 1);
+        }
+
     };
 
     const startClicked = (isStarted) => {
@@ -54,7 +59,7 @@ const SpellBatch = (props) => {
         props.setCorrectWord(word, isCorrect);
         if (isCorrect && !correctWords.includes(word)) {
             correctWords.push(word);
-            setIndex((index) => index + 1);
+            nextClicked();
         }
     };
 
@@ -63,13 +68,13 @@ const SpellBatch = (props) => {
         speakWord(index);
         setCounter(-1);
         setProgressBarColor("progress-bar-green");
-        setCountOfProgess(0);
+        setCountOfProgress(0);
     }, [index]);
 
     const ReloadMessage = () => {
-        setCountOfProgess((oldProgress) => {
+        setCountOfProgress((oldProgress) => {
             if (!started) return 0;
-            if (counter === props.settings.waitTime) {
+            if (counter >= props.settings.waitTime) {
                 setCounter(-1);
                 setIndex((prevIndex)=> prevIndex + 1);
                 setProgressBarColor("progress-bar-green");
@@ -113,7 +118,7 @@ const SpellBatch = (props) => {
                                 return <Form.Label className="word-tested word" key={word}>{word}</Form.Label> 
                             })
                         }
-                        <ProgressBar className={progressBarColor} now={countOfProgess} />
+                        <ProgressBar className={progressBarColor} now={countOfProgress} />
                         <SpellTest word={props.words[index]} voice={props.voice} settings={props.settings} setCorrectWord={setCorrectWord}/>
                         <Button className="button bg-info"  onClick={() => {startClicked(false)}}>Stop</Button>
                         <Button className="button bg-info"  onClick={() => {nextClicked()}}>Next</Button> 
