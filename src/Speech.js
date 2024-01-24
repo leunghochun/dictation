@@ -24,7 +24,7 @@ const Speech = () => {
     const [wordTested, setWordTested] = React.useState({});
     const [waitTime, setWaitTime] = React.useState(10);
     const [repeatTime, setRepeatTime] = React.useState(2);
-    const [numberOfWord, setNumberOfWord] = React.useState(20);
+    const [numberOfWord, setNumberOfWord] = React.useState(5);
     const [selectedGroup, setSelectedGroup] = React.useState("");
     const [img, setImg] = React.useState(null);
     const [text, setText] = React.useState(null);
@@ -247,7 +247,9 @@ const Speech = () => {
                                                     wordList[year]["words"][batch].map((word) => {
                                                         return <Form.Label className={wordTested[word] ? "word word-tested": "word"} key={word}>{word}</Form.Label>
                                                     })
-                                                    : <></>
+                                                    : <>{batch}
+                                                    , {wordList[year].batch}
+                                                    </>
                                                 }
                                                 <br/>
                                                 {

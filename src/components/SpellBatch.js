@@ -50,16 +50,21 @@ const SpellBatch = (props) => {
         if (!isStarted) {
             stopSpeakWord();
             setIndex(-1);
+            props.setYearStarted(props.year, props.batch, isStarted);
         } else {
             nextClicked();
         }
-    };
+    };;
 
     const setCorrectWord = (word, isCorrect) => {
+        console.log(word, props.words, isCorrect);
         props.setCorrectWord(word, isCorrect);
         if (isCorrect && !correctWords.includes(word)) {
             correctWords.push(word);
             nextClicked();
+            if (props.words[props.words.length - 1] === word) {
+                startClicked(false);
+            }
         }
     };
 
@@ -74,6 +79,7 @@ const SpellBatch = (props) => {
     const ReloadMessage = () => {
         setCountOfProgress((oldProgress) => {
             if (!started) return 0;
+            console.log("ReloadMessage:", counter);
             if (counter >= props.settings.waitTime) {
                 setCounter(-1);
                 setIndex((prevIndex)=> prevIndex + 1);
@@ -92,15 +98,15 @@ const SpellBatch = (props) => {
     };
 
     React.useEffect(()=>{
+        props.setYearStarted(props.year, props.batch, started);
         if (started) {
             console.log("started:", started, props.year, props.batch);
-            props.setYearStarted(props.year, props.batch, started);
             const tid = setInterval(ReloadMessage, 2000);
             return () => {
                 clearInterval(tid);
             };
         }
-    }, [started]);
+    }, [started, counter]);
 
     React.useEffect(() => {
        setCorrectWord([]);
