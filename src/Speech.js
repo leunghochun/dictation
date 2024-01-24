@@ -158,6 +158,13 @@ const Speech = () => {
         }
     };
 
+    const triggerSpeakTest = (item) => {
+        console.log(item);
+        // speak({text: item.name, voice: voices[item.value] });
+        // speak({text: "testing 123", voice: voices[item.value]});
+        speak({text: "testing 123" });
+    }
+
     useEffect(() => {
         tryORC();
     }, [img])
@@ -207,11 +214,10 @@ const Speech = () => {
                     <Form.Label>Number of words({numberOfWord})</Form.Label>
                     <Form.Range value={numberOfWord} onChange={numberOfWordSliderChange} min="5" max="30" step="5" />
                     <Form.Label>Voice</Form.Label>
-                    
                     {voiceList.map((item) => {
                         return <div key={ "div" + item.name + item.value } className="flexLayout">
                                 <Form.Check key={"voice" + item.name + item.value} value={item.value} type="radio" label={item.name} onChange={() => voiceChanged(item.value)} checked={item.value === voice} />
-                                <Button key={"button" + item.name +item.value} className="linkButton" variant="link" onClick={() => { speak({text: item.name, voice: voices[item.value] }) }}>Test</Button>
+                                <Button key={"button" + item.name +item.value} className="linkButton" variant="link" onClick={() => {triggerSpeakTest(item)}}>Test</Button>
                             </div>
                         })
                     }
