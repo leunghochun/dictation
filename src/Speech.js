@@ -43,9 +43,10 @@ const Speech = () => {
         return (repeatTime * speakSleep + speakSleep) / 1000;
     }
     
-    const saveSettings = () => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const saveSettings = useCallback(() => {
         localStorage.setItem('settings', JSON.stringify(settings));
-    } 
+    }) 
 
     const [minWaitTime, setMinWaitTime] = React.useState(getMinWaitTime());
 

@@ -42,17 +42,17 @@ const SpellBatch = (props) => {
             stopSpeakWord();
             setIndex((prevIndex) => prevIndex + 1);
         }
-
     };
 
     const startClicked = (isStarted) => {
+        setStarted(isStarted);
+
         if (!isStarted) {
             stopSpeakWord();
             setIndex(-1);
         } else {
-            setIndex(0);
+            nextClicked();
         }
-        setStarted(isStarted);
     };
 
     const setCorrectWord = (word, isCorrect) => {
@@ -92,16 +92,14 @@ const SpellBatch = (props) => {
     };
 
     React.useEffect(()=>{
-        const tid = setInterval(ReloadMessage, 2000);
-
-        return () => {
-            clearInterval(tid);
-        };
-    }, [started, counter]);
-
-    React.useEffect(() => {
-        console.log("started:", started, props.year, props.batch);
-        props.setYearStarted(props.year, props.batch, started);
+        if (started) {
+            console.log("started:", started, props.year, props.batch);
+            props.setYearStarted(props.year, props.batch, started);
+            const tid = setInterval(ReloadMessage, 2000);
+            return () => {
+                clearInterval(tid);
+            };
+        }
     }, [started]);
 
     React.useEffect(() => {
