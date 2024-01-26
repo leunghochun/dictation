@@ -57,8 +57,7 @@ const SpellBatch = (props) => {
     };;
 
     const setCorrectWord = (word, isCorrect) => {
-        console.log(word, props.words, isCorrect);
-        props.setCorrectWord(word, isCorrect);
+        props.setCorrectWord(word, isCorrect, props.year, props.batch);
         if (isCorrect && !correctWords.includes(word)) {
             correctWords.push(word);
             nextClicked();

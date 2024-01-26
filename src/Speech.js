@@ -6,6 +6,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import ListGroup from 'react-bootstrap/ListGroup';
+import Badge from 'react-bootstrap/Badge';
 import Webcam from "react-webcam";
 import Tesseract from "tesseract.js";
 import SpellBatch from "./components/SpellBatch";
@@ -113,6 +114,7 @@ const Speech = () => {
                         let key = i.toString();
                         let batch = array.splice(0, numberOfWord);
                         newWordList[year]["words"]["Batch" + key] = [];
+                        newWordList[year]["Batch" + key + "NoOfCorrect"] = 0;
                         batch.forEach((word) => {
                             newWordList[year]["words"]["Batch" + key].push(word);
                         })
@@ -143,34 +145,29 @@ const Speech = () => {
         });
     };
 
-    const setCorrectWord = async (word, isCorrect) => {
+    const setCorrectWord = async (word, isCorrect, year, batch) => {
         if (word) {
             wordTested[word] = isCorrect;
+            let noOfCorrect = 0;
+            wordList[year]["words"][batch].forEach((word) => noOfCorrect += wordTested[word] ? 1 : 0);
+            wordList[year][batch + "NoOfCorrect"] = noOfCorrect;
             forceUpdate();
         }
     };
 
     const setYearStarted = (year, batch, started) => {
         if (wordList) {
-            if (started)
-                wordList[year]["batch"] = batch;
-            else
-                wordList[year]["batch"] = "";
+            wordList[year]["batch"] = started ? batch : "";
+            console.log("setYearStarted:", started);
+            if (!started) {
+                wordList[year]["words"][batch].forEach((word) => wordTested[word] = false);
+            }
             forceUpdate();
         }
     };
 
     const triggerSpeakTest = (item) => {
-        console.log(item);
-        // speak({text: item.name, voice: voices[item.value] });
-        // speak({text: "testing 123", voice: voices[item.value]});
-        // speak({text: "testing 123", voice: voices[item.value]});
-            speak({text: item.name + "testing 123"});
-        // if (voices[item.value]) {
-        //     speak({text: "testing 123", voice: voices[item.value]});
-        // } else {
-        //     speak({text: "testing 123"});
-        // }
+        speak({text: item.name + "testing 123"});
     }
 
     useEffect(() => {
@@ -247,11 +244,10 @@ const Speech = () => {
                                                     wordList[year]["words"][batch].map((word) => {
                                                         return <Form.Label className={wordTested[word] ? "word word-tested": "word"} key={word}>{word}</Form.Label>
                                                     })
-                                                    : <>{batch}
-                                                    , {wordList[year].batch}
-                                                    </>
+                                                    : <></>
                                                 }
                                                 <br/>
+                                                <Badge bg="success" pill>{wordList[year][batch + "NoOfCorrect"]}</Badge>
                                                 {
                                                     selectedGroup === year + batch ?    
                                                     <>
