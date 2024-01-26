@@ -13,19 +13,29 @@ import SpellBatch from "./components/SpellBatch";
 import wordsJSON from "./words.json";
 
 const Speech = () => {
+    
+    const getSettings = () => {
+        console.log("getSettings");
+        const localSettings = JSON.parse(localStorage.getItem("settings"));
+        return  localSettings ? localSettings : {};
+    }
+
+    const isEmptySetting = () => {
+        return Object.keys(settings).length === 0;
+    }
+
     const webcamRef = useRef(null);
     const { speak, voices } = useSpeechSynthesis();
-
-    const [settings, setSettings] = React.useState({});
+    const [settings, setSettings] = React.useState(getSettings());
     const [voice, setVoice] = React.useState();
     const [enabledWebCam, setEnabledWebCam] = React.useState(false);
     const [rate, setRate] = React.useState(1);
     const [wordData, setWordData] = React.useState(wordsJSON);
     const [wordList, setWordList] = React.useState({});
     const [wordTested, setWordTested] = React.useState({});
-    const [waitTime, setWaitTime] = React.useState(10);
-    const [repeatTime, setRepeatTime] = React.useState(2);
-    const [numberOfWord, setNumberOfWord] = React.useState(5);
+    const [waitTime, setWaitTime] = React.useState(isEmptySetting() ? 10 : settings["waitTime"]);
+    const [repeatTime, setRepeatTime] = React.useState(isEmptySetting() ? 2 : settings["repeatTime"]);
+    const [numberOfWord, setNumberOfWord] = React.useState(isEmptySetting() ? 5 : settings["numberOfWord"]);
     const [selectedGroup, setSelectedGroup] = React.useState("");
     const [img, setImg] = React.useState(null);
     const [text, setText] = React.useState(null);
@@ -64,14 +74,10 @@ const Speech = () => {
 
     const rateSliderChange = (e) => {
         setRate(e.target.value);
-        settings["rate"] = e.target.value;
-        saveSettings();
     };
 
     const waitTimeSliderChange = (e) => {
         setWaitTime(e.target.value);
-        settings["waitTime"] = e.target.value;
-        saveSettings();
     };
 
     const repeatSliderChange = (e) => {
@@ -80,26 +86,24 @@ const Speech = () => {
         if (waitTime > min) {
             setMinWaitTime(min);
         }
-        settings["repeatTime"] = e.target.value;
-        saveSettings();
+        // settings["repeatTime"] = e.target.value;
+        // saveSettings();
     };
     
     const numberOfWordSliderChange = (e) => {
         setNumberOfWord(e.target.value);
-        settings["numberOfWord"] = e.target.value;
-        saveSettings();
     }
     
     const batchSelected = (batch) => {
         setSelectedGroup(batch);
-        settings["selectedGroup"] = batch;
-        saveSettings();
+        // settings["selectedGroup"] = batch;
+        // saveSettings();
     }
 
     const voiceChanged = (selectedVoice) => {
         setVoice(selectedVoice);
-        settings["voice"] = selectedVoice;
-        saveSettings();
+        // settings["voice"] = selectedVoice;
+        // saveSettings();
     }
 
     const generateWordList = (data) => {
@@ -175,31 +179,54 @@ const Speech = () => {
     }, [img])
 
     useEffect(() => {
-        generateWordList(wordData);
-    }, [wordData, numberOfWord])
-
-    useEffect(() => {
         const localSettings = JSON.parse(localStorage.getItem("settings"));
+        generateWordList(wordData);
         if (localSettings) {
             setSettings(localSettings);
         }
     }, []);
 
     useEffect(() => {
-        console.log(settings);
-        if (Object.keys(settings).length > 0) {
-            setWaitTime(settings["waitTime"] ? settings["waitTime"] : waitTime);
-            setNumberOfWord(settings["numberOfWord"] ? settings["numberOfWord"] : numberOfWord);
-            setRepeatTime(settings["repeatTime"] ? settings["repeatTime"] : repeatTime);
-            setVoice(settings["voice"] ? settings["voice"] : voice);
-        } else {
-            settings["waitTime"] = waitTime;
-            settings["numberOfWord"] = numberOfWord;
-            settings["repeatTime"] = repeatTime;
-            settings["voice"] = voice;
-            saveSettings();
-        }
-    }, [numberOfWord, repeatTime, saveSettings, settings, voice, waitTime])
+        settings["numberOfWord"] = numberOfWord;
+        saveSettings();
+        generateWordList(wordData);
+    }, [numberOfWord]);
+
+    useEffect(() => {
+        settings["waitTime"] = waitTime;
+        saveSettings();
+    }, [waitTime]);
+
+    useEffect(() => {
+        settings["repeatTime"] = repeatTime;
+        saveSettings();
+    }, [repeatTime]);
+
+    useEffect(() => {
+        settings["voice"] = voice;
+        saveSettings();
+    }, [voice]);
+
+    useEffect(() => {
+        settings["selectedGroup"] = selectedGroup;
+        saveSettings();
+    }, [selectedGroup]);
+
+    // useEffect(() => {
+    //     console.log(settings);
+    //     settings["waitTime"] = waitTime;
+    //     settings["numberOfWord"] = numberOfWord;
+    //     settings["repeatTime"] = repeatTime;
+    //     settings["voice"] = voice;
+    //     saveSettings();
+    // }, [numberOfWord, repeatTime, voice, waitTime])
+
+    // useEffect(() => {
+    //     setWaitTime(settings["waitTime"]);
+    //     setNumberOfWord(settings["numberOfWord"]);
+    //     setRepeatTime(settings["repeatTime"]);
+    //     setVoice(settings["voice"]);
+    // }, [settings]);
 
     const onActiveKeyChange = (e) => {
         setEnabledWebCam(e.includes("2"));
@@ -217,7 +244,7 @@ const Speech = () => {
                     <Form.Label>Repeat ({repeatTime} X)</Form.Label>
                     <Form.Range value={repeatTime} onChange={repeatSliderChange} min="1" max="3" />
                     <Form.Label>Number of words({numberOfWord})</Form.Label>
-                    <Form.Range value={numberOfWord} onChange={numberOfWordSliderChange} min="5" max="30" step="5" />
+                    <Form.Range value={numberOfWord} onChange={(e) => {numberOfWordSliderChange(e)}} min="5" max="30" step="5" />
                     <Form.Label>Voice</Form.Label>
                     {voiceList.map((item) => {
                         return <div key={ "div" + item.name + item.value } className="flexLayout">

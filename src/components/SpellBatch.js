@@ -98,17 +98,19 @@ const SpellBatch = (props) => {
 
     React.useEffect(()=>{
         props.setYearStarted(props.year, props.batch, started);
+        console.log("started:", started, props.year, props.batch);
         if (started) {
-            console.log("started:", started, props.year, props.batch);
             const tid = setInterval(ReloadMessage, 2000);
             return () => {
                 clearInterval(tid);
             };
+        } else {
+            setCorrectWords([]);
         }
     }, [started, counter]);
 
     React.useEffect(() => {
-       setCorrectWord([]);
+       setCorrectWords([]);
     }, [props.words]);
 
     return (
