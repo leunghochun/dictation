@@ -2,6 +2,7 @@ import React from "react";
 import Form from 'react-bootstrap/Form'
 
 const SpellTest = (props) => {
+    const [ placeHolder, setPlaceHolder] = React.useState("Please input character");
     const [ key, setKey] = React.useState("");
     const [ word, setWord] = React.useState("");
     const [ isCorrect, setIsCorrect ] = React.useState(false);
@@ -28,6 +29,7 @@ const SpellTest = (props) => {
         console.log("correct:", correct, correct && text.length === props.word.length);
         setIsCorrect(correct && text.length === props.word.length);
         setWord(correctChars.join(""));
+        setPlaceHolder(correct ? "Please input next character" : "Wrong character : [" + char + "]");
         setKey("");
     };
 
@@ -47,7 +49,7 @@ const SpellTest = (props) => {
     return (
         <>
             <Form.Label className="word-tested word" key={word}>{word}</Form.Label> 
-            <Form.Control size="lg" type="text" placeholder="Vocabulary" onKeyUp={inputKeyUp} onChange={inputKeyUp} value={key}/>
+            <Form.Control size="lg" type="text" placeholder={placeHolder} onChange={inputKeyUp} value={key}/>
         </>
     );
 };
