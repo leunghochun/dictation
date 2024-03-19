@@ -29,7 +29,7 @@ const SpellTest = (props) => {
         console.log("correct:", correct, correct && text.length === props.word.length);
         setIsCorrect(correct && text.length === props.word.length);
         setWord(correctChars.join(""));
-        setPlaceHolder(correct ? "Please input next character" : "Wrong character : [" + char + "]");
+        setPlaceHolder(correct ? "Please input next character" : `"${char}" is wrong`);
         setKey("");
     };
 

@@ -20,11 +20,11 @@ const SpellBatch = (props) => {
     const speakWord = (index) => {
         for(let j = 0; j < props.settings.repeatTime; j++) {
             timers.push(setTimeout(() => {
-                if (props.settings.voice === 0 || props.settings.voice) {
-                    speak({ text: props.words[index], voice: voices[props.settings.voice], rate: props.settings.rate ? props.settings.rate : "1"});
-                } else {
+                // if (props.settings.voice === 0 || props.settings.voice) {
+                //     speak({ text: props.words[index], voice: voices[props.settings.voice], rate: props.settings.rate ? props.settings.rate : "1"});
+                // } else {
                     speak({ text: props.words[index], rate: props.settings.rate ? props.settings.rate : "1"});
-                }
+                // }
             }, speakSleep * j));
         }
     };
