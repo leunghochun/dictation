@@ -26,7 +26,6 @@ const SpellTest = (props) => {
                 break;
             }
         }
-        console.log("correct:", correct, correct && text.length === props.word.length);
         setIsCorrect(correct && text.length === props.word.length);
         setWord(correctChars.join(""));
         setPlaceHolder(correct ? "Please input next character" : `"${char}" is wrong`);
@@ -38,12 +37,10 @@ const SpellTest = (props) => {
             props.setCorrectWord(props.word, isCorrect);
             setWord("");
         }
-        console.log("isCorrect Effect:", isCorrect);
     }, [isCorrect]);
 
     React.useEffect(() => {
         setWord("");
-        console.log("props.word", props.word);
     }, [props.word])
 
     return (

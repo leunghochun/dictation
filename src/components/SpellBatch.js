@@ -35,7 +35,6 @@ const SpellBatch = (props) => {
     };
     
     const nextClicked = () => {
-        console.log("nextClicked", index);
         if (index >= props.words.length) {
             startClicked(false);
         } else {
@@ -78,7 +77,6 @@ const SpellBatch = (props) => {
     const ReloadMessage = () => {
         setCountOfProgress((oldProgress) => {
             if (!started) return 0;
-            console.log("ReloadMessage:", counter);
             if (counter >= props.settings.waitTime) {
                 setCounter(-1);
                 setIndex((prevIndex)=> prevIndex + 1);
@@ -98,7 +96,6 @@ const SpellBatch = (props) => {
 
     React.useEffect(()=>{
         props.setYearStarted(props.year, props.batch, started);
-        console.log("started:", started, props.year, props.batch);
         if (started) {
             const tid = setInterval(ReloadMessage, 2000);
             return () => {

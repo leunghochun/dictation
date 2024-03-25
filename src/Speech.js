@@ -15,7 +15,6 @@ import wordsJSON from "./words.json";
 const Speech = () => {
     
     const getSettings = () => {
-        console.log("getSettings");
         const localSettings = JSON.parse(localStorage.getItem("settings"));
         return  localSettings ? localSettings : {};
     }
@@ -126,7 +125,6 @@ const Speech = () => {
                     }
                 }
                 setSelectedGroup(Object.keys(newWordList[Object.keys(newWordList)[0]]["words"])[0]);
-                console.log(newWordList);
                 return newWordList;
         });
     }
@@ -138,13 +136,10 @@ const Speech = () => {
     };
 
     const tryORC = () => {
-        console.log("Start OCR");
-        // const imageSrc = this.webcamRef.current.getScreenshot();
         if (!img) return;
         Tesseract.recognize(img, "eng", {
           logger: (m) => console.log(m.progress)
         }).then(({ data: { text } }) => {
-          // console.log(text);
           setText(text);
         });
     };
@@ -162,7 +157,6 @@ const Speech = () => {
     const setYearStarted = (year, batch, started) => {
         if (wordList) {
             wordList[year]["batch"] = started ? batch : "";
-            console.log("setYearStarted:", started);
             if (!started) {
                 wordList[year]["words"][batch].forEach((word) => wordTested[word] = false);
             }
@@ -211,22 +205,6 @@ const Speech = () => {
         settings["selectedGroup"] = selectedGroup;
         saveSettings();
     }, [selectedGroup]);
-
-    // useEffect(() => {
-    //     console.log(settings);
-    //     settings["waitTime"] = waitTime;
-    //     settings["numberOfWord"] = numberOfWord;
-    //     settings["repeatTime"] = repeatTime;
-    //     settings["voice"] = voice;
-    //     saveSettings();
-    // }, [numberOfWord, repeatTime, voice, waitTime])
-
-    // useEffect(() => {
-    //     setWaitTime(settings["waitTime"]);
-    //     setNumberOfWord(settings["numberOfWord"]);
-    //     setRepeatTime(settings["repeatTime"]);
-    //     setVoice(settings["voice"]);
-    // }, [settings]);
 
     const onActiveKeyChange = (e) => {
         setEnabledWebCam(e.includes("2"));
