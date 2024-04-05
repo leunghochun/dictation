@@ -1,10 +1,10 @@
 
 import './App.css';
-import Speech from './Speech';
+import Dictation from './Dictation';
 function App() {
     return (
         <div className="App">
-            <Speech />
+            <Dictation />
         </div>
     );
 }

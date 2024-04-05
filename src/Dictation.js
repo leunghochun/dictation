@@ -9,7 +9,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Badge from 'react-bootstrap/Badge';
 import Webcam from "react-webcam";
 import Tesseract from "tesseract.js";
-import SpellBatch from "./components/SpellBatch";
+import Batch from "./components/Batch";
 import wordsJSON from "./words.json";
 
 const Speech = () => {
@@ -19,8 +19,8 @@ const Speech = () => {
         return  localSettings ? localSettings : {};
     }
 
-    const isEmptySetting = () => {
-        return Object.keys(settings).length === 0;
+    const isEmptySetting = (key, value) => {
+        return Object.keys(settings).length === 0 && settings[key] ? settings[key] : value;
     }
 
     const webcamRef = useRef(null);
@@ -28,18 +28,19 @@ const Speech = () => {
     const [settings, setSettings] = React.useState(getSettings());
     const [voice, setVoice] = React.useState();
     const [enabledWebCam, setEnabledWebCam] = React.useState(false);
-    const [rate, setRate] = React.useState(1);
     const [wordData, setWordData] = React.useState(wordsJSON);
     const [wordList, setWordList] = React.useState({});
     const [wordTested, setWordTested] = React.useState({});
-    const [waitTime, setWaitTime] = React.useState(isEmptySetting() ? 10 : settings["waitTime"]);
-    const [repeatTime, setRepeatTime] = React.useState(isEmptySetting() ? 2 : settings["repeatTime"]);
-    const [numberOfWord, setNumberOfWord] = React.useState(isEmptySetting() ? 5 : settings["numberOfWord"]);
+    const [rate, setRate] = React.useState(isEmptySetting("rate", 1));
+    const [waitTime, setWaitTime] = React.useState(isEmptySetting("waitTime", 10)); 
+    const [repeatTime, setRepeatTime] = React.useState(isEmptySetting("repeatTime", 2));
+    const [numberOfWord, setNumberOfWord] = React.useState(isEmptySetting("numberOfWord", 5));
+    const [numberOfAttempt, setNumberOfAttempt] = React.useState(isEmptySetting("numberOfAttempt", 5));
     const [selectedGroup, setSelectedGroup] = React.useState("");
     const [img, setImg] = React.useState(null);
     const [text, setText] = React.useState(null);
     const [, updateState] = React.useState();
-    const forceUpdate = React.useCallback(() => updateState({}), []);
+    // const forceUpdate = React.useCallback(() => updateState({}), []);
 
     const capture = useCallback(() => {
         const imageSrc = webcamRef.current.getScreenshot();
@@ -89,6 +90,10 @@ const Speech = () => {
         // saveSettings();
     };
     
+    const numberOfAttemptSliderChange = (e) => {
+        setNumberOfAttempt(e.target.value);
+    }
+
     const numberOfWordSliderChange = (e) => {
         setNumberOfWord(e.target.value);
     }
@@ -150,7 +155,7 @@ const Speech = () => {
             let noOfCorrect = 0;
             wordList[year]["words"][batch].forEach((word) => noOfCorrect += wordTested[word] ? 1 : 0);
             wordList[year][batch + "NoOfCorrect"] = noOfCorrect;
-            forceUpdate();
+            // forceUpdate();
         }
     };
 
@@ -160,7 +165,7 @@ const Speech = () => {
             if (!started) {
                 wordList[year]["words"][batch].forEach((word) => wordTested[word] = false);
             }
-            forceUpdate();
+            // forceUpdate();
         }
     };
 
@@ -187,6 +192,11 @@ const Speech = () => {
     }, [numberOfWord]);
 
     useEffect(() => {
+        settings["numberOfAttempt"] = numberOfAttempt;
+        saveSettings();
+    }, [numberOfAttempt]);
+
+    useEffect(() => {
         settings["waitTime"] = waitTime;
         saveSettings();
     }, [waitTime]);
@@ -200,6 +210,11 @@ const Speech = () => {
         settings["voice"] = voice;
         saveSettings();
     }, [voice]);
+
+    useEffect(() => {
+        settings["rate"] = rate;
+        saveSettings();
+    }, [rate]);
 
     useEffect(() => {
         settings["selectedGroup"] = selectedGroup;
@@ -221,6 +236,8 @@ const Speech = () => {
                     <Form.Range value={waitTime} onChange={waitTimeSliderChange} min={minWaitTime} max="30" />
                     <Form.Label>Repeat ({repeatTime} X)</Form.Label>
                     <Form.Range value={repeatTime} onChange={repeatSliderChange} min="1" max="3" />
+                    <Form.Label>Number of Attempt ({numberOfAttempt})</Form.Label>
+                    <Form.Range value={numberOfAttempt} onChange={(e) => {numberOfAttemptSliderChange(e)}} min="5" max="10" step="1" />
                     <Form.Label>Number of words({numberOfWord})</Form.Label>
                     <Form.Range value={numberOfWord} onChange={(e) => {numberOfWordSliderChange(e)}} min="5" max="30" step="5" />
                     <Form.Label>Voice</Form.Label>
@@ -256,7 +273,7 @@ const Speech = () => {
                                                 {
                                                     selectedGroup === year + batch ?    
                                                     <>
-                                                        <SpellBatch words={wordList[year]["words"][batch]} 
+                                                        <Batch words={wordList[year]["words"][batch]} 
                                                                     settings={settings}
                                                                     setCorrectWord={setCorrectWord} 
                                                                     setYearStarted={setYearStarted}
