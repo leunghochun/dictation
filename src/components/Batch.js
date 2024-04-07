@@ -11,6 +11,8 @@ const Batch = (props) => {
     // const [ timers, setTimers ] = React.useState([]);
     // const [ progressTimer, setProgressTimer ] = React.useState();
     const [ correctWords, setCorrectWords ] = React.useState([]);
+    const [ wordList, setWordList ] = React.useState({});
+    const [ currentWord, setCurrentWord ] = React.useState(null); 
     // const speakSleep = 3000;
 
     // const speakWord = (index) => {
@@ -34,6 +36,7 @@ const Batch = (props) => {
         if (index >= props.words.length) {
             startClicked(false);
         } else {
+            nextWord(currentWord, false, true);
             // stopSpeakWord();
             setIndex((prevIndex) => prevIndex + 1);
         }
@@ -47,19 +50,28 @@ const Batch = (props) => {
             setIndex(-1);
             props.setYearStarted(props.year, props.batch, isStarted);
         } else {
-            nextClicked();
+            // nextClicked();
+            initWords();
         }
     };;
 
-    const setCorrectWord = (word, isCorrect) => {
-        props.setCorrectWord(word, isCorrect, props.year, props.batch);
-        if (isCorrect && !correctWords.includes(word)) {
-            correctWords.push(word);
-            nextClicked();
-            if (props.words[props.words.length - 1] === word) {
-                startClicked(false);
-            }
-        }
+    const setCorrectWord = (word, isCorrect, attemptCompleted) => {
+        if (!isCorrect && !attemptCompleted) return;
+
+        nextWord(word, isCorrect, attemptCompleted);
+
+        // wordList[word].isCorrect = isCorrect;
+        // wordList[word].start = false;
+        // wordList[word].attempted = attemptCompleted;
+
+        // let i = wordList[word].index + 1;
+        // setCurrentWord(props.words[i]);
+
+        // if (!props.words[i]) { 
+        //     startClicked(false);
+        // }
+
+        setCorrectWord(props.words.filter((word) => wordList[word].isCorrect));
     };
 
     React.useEffect(() => {
@@ -103,8 +115,39 @@ const Batch = (props) => {
     // }, [started, counter]);
     }, [started]);
 
+    const initWords = () => {
+        let i = 0;
+        props.words.forEach((word) => {
+            wordList[word] = { 
+                start: i === 0,
+                attempted: false,
+                isCorrect: false,
+                index: i
+            };
+            i++;
+        });
+        console.log(props.words, wordList);
+        setCurrentWord(props.words[0]);
+    };
+
+    const nextWord = (word, isCorrect, attemptCompleted) => {
+        wordList[word].isCorrect = isCorrect;
+        wordList[word].start = false;
+        wordList[word].attempted = attemptCompleted;
+
+        let i = wordList[word].index + 1;
+        setCurrentWord(props.words[i]);
+
+        if (!props.words[i]) { 
+            startClicked(false);
+        }
+    };
+
     React.useEffect(() => {
-       setCorrectWords([]);
+        if (Object.keys(wordList).length > 0) return;
+
+        setCorrectWords([]);
+        initWords();
     }, [props.words]);
 
     return (
@@ -117,8 +160,7 @@ const Batch = (props) => {
                                 return <Form.Label className="word-tested word" key={word}>{word}</Form.Label> 
                             })
                         }
-                        <Spell start={true} word="Apple" voice={props.voice} settings={props.settings} setCorrectWord={setCorrectWord}/>
-                        {/* <spell word={props.words[index]} voice={props.voice} settings={props.settings} setCorrectWord={setCorrectWord}/> */}
+                        <Spell word={currentWord} settings={props.settings} setCorrectWord={setCorrectWord}/>
                         <Button className="button bg-info"  onClick={() => {startClicked(false)}}>Stop</Button>
                         <Button className="button bg-info"  onClick={() => {nextClicked()}}>Next</Button> 
                     </>

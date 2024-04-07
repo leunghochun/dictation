@@ -179,7 +179,7 @@ const Speech = () => {
 
     useEffect(() => {
         const localSettings = JSON.parse(localStorage.getItem("settings"));
-        generateWordList(wordData);
+        // generateWordList(wordData);
         if (localSettings) {
             setSettings(localSettings);
         }

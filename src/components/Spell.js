@@ -12,8 +12,6 @@ const Spell = (props) => {
     const [ word, setWord] = React.useState("");
     const [ attempt, setAttempt] = React.useState(0);
     const [ isCorrect, setIsCorrect ] = React.useState(false);
-
-    const [ progressBarColor, setProgressBarColor] = React.useState("progress-bar-green");
     const [ countOfProgress, setCountOfProgress ] = React.useState(0);
     const [ counter, setCounter ] = React.useState(0);
 
@@ -39,42 +37,65 @@ const Spell = (props) => {
                 break;
             }
         }
-        setIsCorrect(correct && text.length === props.word.length);
-        setWord(correctChars.join(""));
-        setPlaceHolder(correct ? "Please input next character" : `"${char}" is wrong`);
-        setKey("");
-        setAttempt((attempt) => attempt + 1);
-        console.log(attempt, word);
+
+        if (correct && text.length === props.word.length) {
+            props.setCorrectWord(props.word, correct);
+            stopSpeakWord();
+        } else {
+            setPlaceHolder(correct ? "Please input next character" : `"${char}" is wrong`);
+            setWord(correctChars.join(""));
+            setKey("");
+            if (!correct) setAttempt((attempt) => attempt + 1);
+        }
     };
 
     const speakWord = () => {
         for(let j = 0; j < props.settings.repeatTime; j++) {
-            timers.push(setTimeout(() => {
+            let timer = setTimeout(() => {
                 speak({ text: props.word, rate: props.settings.rate ? props.settings.rate : "1"});
-            }, speakSleep * j));
+            }, speakSleep * j);
+            timers.push(timer);
+
+            // return () => {
+            //     clearTimeout(timer);
+            // }
+            // timers.push(setTimeout(() => {
+            //     speak({ text: props.word, rate: props.settings.rate ? props.settings.rate : "1"});
+            // }, speakSleep * j));
+
+            // // return () => {
+            // //     stopSpeakWord();
+            // // }
         }
     };
             
     const stopSpeakWord = () =>{
+        console.log("stopSpeakWord");
         timers.forEach(timer => {clearTimeout(timer)});
     };
 
-    React.useEffect(()=> {
-        if (props.word) {
-            props.setCorrectWord(props.word, isCorrect);
-            setWord("");
+    React.useEffect(() => {
+        if (attempt >= props.settings.numberOfAttempt) {
+            props.setCorrectWord(props.word, false /* isCorrect */, true /* attempt completed */ );
+            stopSpeakWord();
         }
-    }, [isCorrect, props]);
+    }, [attempt]);
 
     React.useEffect(() => {
         setWord("");
+        setKey("");
+        setAttempt(0);
+        setCountOfProgress(0);
+        setIsCorrect(false);
+        setCountOfProgress(0);
+        setCounter(0);
+        console.log(props.word);
     }, [props.word])
-
+    
     const GetProgressBarColor = () => {
         // determine the color of progress bar
         let progress = counter/ props.settings.waitTime * 100;
         if (progress >= 50) {
-            // return setProgressBarColor(progress >= 75 ? "progress-bar-red" : "progress-bar-yellow");
             return progress >= 75 ? "progress-bar-red" : "progress-bar-yellow";
         } else {
             return "progress-bar-green";
@@ -84,34 +105,33 @@ const Spell = (props) => {
     React.useEffect(() => {
         const timeeout = setTimeout(() => {
             setCounter(counter + 1);
-            // console.log(counter);
-            if (counter === 0) speakWord();
+            if (counter === 0) {
+                speakWord(); 
+            } else if (counter >= 10) {
+                props.setCorrectWord(props.word, false /* isCorrect */, true /* attempt completed */ );
+                clearTimeout(timeeout);
+            }
         }, 1000)
         
-        console.log(counter);
-        if (counter >= 10) {
-            clearTimeout(timeeout);
-        }
         return () => {
             clearTimeout(timeeout);
+            // stopSpeakWord();
         };
     }, [counter, speak]);
 
+    React.useEffect(() => {
+        return () => {
+            console.log("timers");
+            stopSpeakWord();
+        };
+    }, [timers]);
+
     return (
         <>
-            {
-                props.start 
-                ?
-                    <>
-                        <div>Progress: {countOfProgress}</div>
-                        {/* <ProgressBar className={progressBarColor} now={countOfProgress} /> */}
-                        <ProgressBar className={GetProgressBarColor()} now={counter / props.settings.waitTime * 100} />
-                        <Form.Label className="word-tested word" key={props.word}>{word}</Form.Label> 
-                        <Form.Control size="lg" type="text" placeholder={placeHolder} onChange={inputKeyUp} value={key}/>
-                    </>
-                :
-                    <></>
-            }
+            <div>Progress: {countOfProgress}, attempt: {attempt}, word: {props.word} </div>
+            <ProgressBar className={GetProgressBarColor()} now={counter / props.settings.waitTime * 100} />
+            <Form.Label className="word-tested word" key={props.word}>{word}</Form.Label> 
+            <Form.Control size="lg" type="text" placeholder={placeHolder} onChange={inputKeyUp} value={key}/>
         </>
     );
 };
