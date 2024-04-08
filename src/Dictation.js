@@ -20,7 +20,7 @@ const Speech = () => {
     }
 
     const isEmptySetting = (key, value) => {
-        return Object.keys(settings).length === 0 && settings[key] ? settings[key] : value;
+        return Object.keys(settings).length > 0 && settings[key] ? settings[key] : value;
     }
 
     const webcamRef = useRef(null);
@@ -54,11 +54,6 @@ const Speech = () => {
         return (repeatTime * speakSleep + speakSleep) / 1000;
     }
     
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const saveSettings = useCallback(() => {
-        localStorage.setItem('settings', JSON.stringify(settings));
-    }) 
-
     const [minWaitTime, setMinWaitTime] = React.useState(getMinWaitTime());
 
     const getVoices = () => {
@@ -86,8 +81,6 @@ const Speech = () => {
         if (waitTime > min) {
             setMinWaitTime(min);
         }
-        // settings["repeatTime"] = e.target.value;
-        // saveSettings();
     };
     
     const numberOfAttemptSliderChange = (e) => {
@@ -100,14 +93,10 @@ const Speech = () => {
     
     const batchSelected = (batch) => {
         setSelectedGroup(batch);
-        // settings["selectedGroup"] = batch;
-        // saveSettings();
     }
 
     const voiceChanged = (selectedVoice) => {
         setVoice(selectedVoice);
-        // settings["voice"] = selectedVoice;
-        // saveSettings();
     }
 
     const generateWordList = (data) => {
@@ -185,39 +174,19 @@ const Speech = () => {
 
     useEffect(() => {
         settings["numberOfWord"] = numberOfWord;
-        saveSettings();
-        generateWordList(wordData);
-    }, [numberOfWord]);
-
-    useEffect(() => {
         settings["numberOfAttempt"] = numberOfAttempt;
-        saveSettings();
-    }, [numberOfAttempt]);
-
-    useEffect(() => {
         settings["waitTime"] = waitTime;
-        saveSettings();
-    }, [waitTime]);
-
-    useEffect(() => {
         settings["repeatTime"] = repeatTime;
-        saveSettings();
-    }, [repeatTime]);
-
-    useEffect(() => {
         settings["voice"] = voice;
-        saveSettings();
-    }, [voice]);
-
-    useEffect(() => {
         settings["rate"] = rate;
-        saveSettings();
-    }, [rate]);
+        settings["selectedGroup"] = selectedGroup;
+
+        localStorage.setItem('settings', JSON.stringify(settings));
+    },[numberOfAttempt, numberOfWord, rate, repeatTime, selectedGroup, settings, voice, waitTime])
 
     useEffect(() => {
-        settings["selectedGroup"] = selectedGroup;
-        saveSettings();
-    }, [selectedGroup]);
+        generateWordList(wordData);
+    }, [wordData]);
 
     const onActiveKeyChange = (e) => {
         setEnabledWebCam(e.includes("2"));

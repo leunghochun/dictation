@@ -97,7 +97,7 @@ const Spell = (props) => {
         return () => {
             clearTimeout(timeout);
         };
-    }, [counter, speak, speakCount]);
+    }, [counter, props, speak, speakCount]);
 
     return (
         <Collapse in={open} dimension="width">
