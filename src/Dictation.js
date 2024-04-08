@@ -155,7 +155,6 @@ const Speech = () => {
             let noOfCorrect = 0;
             wordList[year]["words"][batch].forEach((word) => noOfCorrect += wordTested[word] ? 1 : 0);
             wordList[year][batch + "NoOfCorrect"] = noOfCorrect;
-            // forceUpdate();
         }
     };
 
@@ -165,7 +164,6 @@ const Speech = () => {
             if (!started) {
                 wordList[year]["words"][batch].forEach((word) => wordTested[word] = false);
             }
-            // forceUpdate();
         }
     };
 
@@ -261,30 +259,14 @@ const Speech = () => {
                                         Object.keys(wordList[year]["words"]).map((batch) => {
                                         return (
                                             <ListGroup.Item key={year + batch} action href={"#" + year + batch} onClick={() => batchSelected(year + batch)}>
-                                                {
-                                                    wordList[year].batch !== batch ?
-                                                    wordList[year]["words"][batch].map((word) => {
-                                                        return <Form.Label className={wordTested[word] ? "word word-tested": "word"} key={word}>{word}</Form.Label>
-                                                    })
-                                                    : <></>
-                                                }
-                                                <br/>
-                                                <Badge bg="success" pill>{wordList[year][batch + "NoOfCorrect"]}</Badge>
-                                                {
-                                                    selectedGroup === year + batch ?    
-                                                    <>
-                                                        <Batch words={wordList[year]["words"][batch]} 
-                                                                    settings={settings}
-                                                                    setCorrectWord={setCorrectWord} 
-                                                                    setYearStarted={setYearStarted}
-                                                                    year={year}
-                                                                    batch={batch}
-                                                                    />
-                                                    </>
-                                                    :
-                                                    <></>
-                                                }
-                                            </ListGroup.Item>
+                                                <Batch words={wordList[year]["words"][batch]} 
+                                                        settings={settings}
+                                                        setCorrectWord={setCorrectWord} 
+                                                        setYearStarted={setYearStarted}
+                                                        year={year}
+                                                        batch={batch}
+                                                />
+                                           </ListGroup.Item>
                                             )
                                         })
                                     }

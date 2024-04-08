@@ -27,8 +27,13 @@
 	text-align: left;
 }
 
-.word-tested {
+.word-tested-correct {
 	color: yellow;
+	font-weight: bold;
+}
+
+.word-tested-incorrect {
+	color: red;
 	font-weight: bold;
 }
 
