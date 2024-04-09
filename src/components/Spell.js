@@ -3,6 +3,7 @@ import Form from 'react-bootstrap/Form'
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Collapse from 'react-bootstrap/Collapse';
 import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
 
 import { useSpeechSynthesis } from "react-speech-kit";
 
@@ -22,6 +23,11 @@ const Spell = (props) => {
     const [ speakCount, setSpeakCount] = React.useState(0);
 
     const speakInterval = 3;
+
+    const speakIt = () => {
+        speak({ text: props.word, rate: props.settings.rate ? props.settings.rate : "1"});
+        setAttempt(attempt + 1);
+    };
 
     const inputKeyUp = (event) =>{
         if (!props.word) return;
@@ -106,6 +112,7 @@ const Spell = (props) => {
                 <ProgressBar className={GetProgressBarColor()} now={counter / props.settings.waitTime * 100} />
                 <Form.Label className="word-tested word" key={props.word}>{word}</Form.Label> 
                 <Form.Control size="lg" type="text" placeholder={placeHolder} onChange={inputKeyUp} value={key}/>
+                <Button className="button bg-info"  onClick={() => {speakIt()}}>Speak</Button>
             </Card>
         </Collapse>
     );
