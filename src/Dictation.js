@@ -187,7 +187,7 @@ const Speech = () => {
 
     useEffect(() => {
         generateWordList(wordData);
-    }, [wordData]);
+    }, [wordData, numberOfWord]);
 
     const onActiveKeyChange = (e) => {
         setEnabledWebCam(e.includes("2"));
