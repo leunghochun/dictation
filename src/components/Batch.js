@@ -23,10 +23,10 @@ const Batch = (props) => {
 
     const startClicked = (isStarted) => {
         setStarted(isStarted);
+        props.setYearStarted(props.year, props.batch, isStarted);
 
         if (!isStarted) {
             setIndex(-1);
-            props.setYearStarted(props.year, props.batch, isStarted);
         } else {
             initWords();
         }
@@ -39,16 +39,17 @@ const Batch = (props) => {
 
         setCorrectWords(props.words.filter((word) => wordList[word].isCorrect));
         props.setCorrectWord(word, isCorrect, props.year, props.batch);
-        console.log("setCorrectWord", wordList);
     };
 
     React.useEffect(() => {
         if (index < 0) return;
     }, [index]);
 
-    React.useEffect(()=>{
-        props.setYearStarted(props.year, props.batch, started);
-    }, [props, started]);
+    // React.useEffect
+
+    // React.useEffect(()=>{
+    //     props.setYearStarted(props.year, props.batch, started);
+    // }, [props, started]);
 
     const initWords = () => {
         let i = 0;
@@ -88,7 +89,7 @@ const Batch = (props) => {
         <>
             <Badge bg="success" pill>{ Object.keys(wordList).filter((word) => wordList[word].isCorrect ).length}</Badge>
             {   
-                started ?
+                started && props.isShow ?
                     <>
                         {
                             Object.keys(wordList).filter((word) => wordList[word].attempted).map((word) => {

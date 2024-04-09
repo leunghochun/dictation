@@ -148,6 +148,7 @@ const Speech = () => {
     };
 
     const setYearStarted = (year, batch, started) => {
+        console.log("setYearStarted:", year, batch, started);
         if (wordList) {
             wordList[year]["batch"] = started ? batch : "";
             if (!started) {
@@ -234,6 +235,7 @@ const Speech = () => {
                                                         setYearStarted={setYearStarted}
                                                         year={year}
                                                         batch={batch}
+                                                        isShow={batch === wordList[year]["batch"]}
                                                 />
                                            </ListGroup.Item>
                                             )
