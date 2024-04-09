@@ -9,7 +9,6 @@ import { useSpeechSynthesis } from "react-speech-kit";
 
 const Spell = (props) => {
     const { speak } = useSpeechSynthesis();
-    const [ timers, setTimers ] = React.useState([]);
 
     const [ placeHolder, setPlaceHolder] = React.useState("Please input character");
     const [ key, setKey] = React.useState("");
@@ -24,9 +23,11 @@ const Spell = (props) => {
 
     const speakInterval = 3;
 
-    const speakIt = () => {
+    const speakIt = (isCountAttempt) => {
         speak({ text: props.word, rate: props.settings.rate ? props.settings.rate : "1"});
-        setAttempt(attempt + 1);
+        if (isCountAttempt) { 
+            setAttempt(attempt + 1);
+        }
     };
 
     const inputKeyUp = (event) =>{
@@ -64,7 +65,7 @@ const Spell = (props) => {
         if (attempt >= props.settings.numberOfAttempt) {
             props.setCorrectWord(props.word, false /* isCorrect */, true /* attempt completed */ );
         }
-    }, [attempt]);
+    }, [attempt, props]);
 
     React.useEffect(() => {
         setWord("");
@@ -92,7 +93,7 @@ const Spell = (props) => {
         const timeout = setTimeout(() => {
             setCounter(counter + 1);
             if (counter % speakInterval === 0 && speakCount < props.settings.repeatTime) {
-                    speak({ text: props.word, rate: props.settings.rate ? props.settings.rate : "1"});
+                    speakIt(false);
                     setSpeakCount(speak => speak + 1);    
             } else if (counter >= props.settings.waitTime) {
                 props.setCorrectWord(props.word, false /* isCorrect */, true /* attempt completed */ );
@@ -103,17 +104,16 @@ const Spell = (props) => {
         return () => {
             clearTimeout(timeout);
         };
-    }, [counter, props, speak, speakCount]);
+    }, [speak]);
 
     return (
         <Collapse in={open} dimension="width">
             <Card body style={{ width: "100vw" }}>
-                {/* <div>Progress: {countOfProgress}, attempt: {attempt}, word: {props.word} </div> */}
                 <ProgressBar className={GetProgressBarColor()} now={counter / props.settings.waitTime * 100} />
                 <Form.Label className="word-tested word" key={props.word}>{word}</Form.Label> 
                 <Form.Control size="lg" type="text" placeholder={placeHolder} onChange={inputKeyUp} value={key}/>
                 <dov>No of Attempt left: { props.settings.numberOfAttempt - attempt } </dov>
-                <Button className="button bg-info"  onClick={() => {speakIt()}}>Speak</Button>
+                <Button className="button bg-info"  onClick={() => {speakIt(true)}}>Speak</Button>
             </Card>
         </Collapse>
     );
