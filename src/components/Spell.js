@@ -112,6 +112,7 @@ const Spell = (props) => {
                 <ProgressBar className={GetProgressBarColor()} now={counter / props.settings.waitTime * 100} />
                 <Form.Label className="word-tested word" key={props.word}>{word}</Form.Label> 
                 <Form.Control size="lg" type="text" placeholder={placeHolder} onChange={inputKeyUp} value={key}/>
+                <dov>No of Attempt left: { props.settings.numberOfAttempt - attempt } </dov>
                 <Button className="button bg-info"  onClick={() => {speakIt()}}>Speak</Button>
             </Card>
         </Collapse>
