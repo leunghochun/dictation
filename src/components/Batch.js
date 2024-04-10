@@ -90,7 +90,7 @@ const Batch = (props) => {
                                 return <Form.Label className={`word-tested-${wordList[word].isCorrect ? "correct" : "incorrect"} word`} key={word}>{word}</Form.Label> 
                             })
                         }
-                        <Spell word={currentWord} settings={props.settings} setCorrectWord={setCorrectWord} speak={props.speak}/>
+                        <Spell word={currentWord} settings={props.settings} setCorrectWord={setCorrectWord} speakIt={props.speakIt}/>
                         <Button className="button bg-info"  onClick={() => {startClicked(false)}}>Stop</Button>
                         <Button className="button bg-info"  onClick={() => {nextClicked()}}>Next</Button> 
                     </>

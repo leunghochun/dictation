@@ -6,7 +6,6 @@ import Accordion from 'react-bootstrap/Accordion';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import ListGroup from 'react-bootstrap/ListGroup';
-import Badge from 'react-bootstrap/Badge';
 import Webcam from "react-webcam";
 import Tesseract from "tesseract.js";
 import Batch from "./components/Batch";
@@ -39,15 +38,16 @@ const Dictation = () => {
     const [selectedGroup, setSelectedGroup] = React.useState("");
     const [img, setImg] = React.useState(null);
     const [text, setText] = React.useState(null);
-    const [, updateState] = React.useState();
-    // const forceUpdate = React.useCallback(() => updateState({}), []);
+
+    const speakIt = (text) => {
+        speak({ text: text, rate: settings.rate ? settings.rate : "1"});
+    };
 
     const capture = useCallback(() => {
         const imageSrc = webcamRef.current.getScreenshot();
         setImg(imageSrc);
       }, [webcamRef]);
 
-    const voiceNames = ['Samantha', 'Aaron', 'Daniel (English (United Kingdom))'];
     const speakSleep = 3000;
     
     const getMinWaitTime = () => {
@@ -235,7 +235,7 @@ const Dictation = () => {
                                                         year={year}
                                                         batch={batch}
                                                         isShow={year + batch === selectedGroup ? true : false}
-                                                        speak={speak}
+                                                        speakIt={speakIt}
                                                 />
                                            </ListGroup.Item>
                                             )

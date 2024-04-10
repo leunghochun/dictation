@@ -23,10 +23,11 @@ const Spell = (props) => {
 
     const speakInterval = 3;
 
-    const speakIt = (isCountAttempt) => {
-        props.speak({ text: props.word, rate: props.settings.rate ? props.settings.rate : "1"});
+    const speakNow = (isCountAttempt) => {
+    // const speakNow = () => {
+        props.speakIt(props.word);
         if (isCountAttempt) { 
-            setAttempt(attempt + 1);
+            setAttempt((prev) => prev + 1);
         }
     };
 
@@ -73,7 +74,6 @@ const Spell = (props) => {
         setAttempt(0);
         setCountOfProgress(0);
         setIsCorrect(false);
-        setCountOfProgress(0);
         setCounter(0);
         setSpeakCount(0);
         setOpen(true);
@@ -93,7 +93,7 @@ const Spell = (props) => {
         const timeout = setTimeout(() => {
             setCounter(counter + 1);
             if (counter % speakInterval === 0 && speakCount < props.settings.repeatTime) {
-                    speakIt(false);
+                    speakNow(false);
                     setSpeakCount(speak => speak + 1);    
             } else if (counter >= props.settings.waitTime) {
                 props.setCorrectWord(props.word, false /* isCorrect */, true /* attempt completed */ );
@@ -104,7 +104,7 @@ const Spell = (props) => {
         return () => {
             clearTimeout(timeout);
         };
-    }, [counter, props, speakCount, speakIt]);
+    }, [counter, props, speakCount]);
 
     return (
         <Collapse in={open} dimension="width">
@@ -113,7 +113,7 @@ const Spell = (props) => {
                 <Form.Label className="word-tested word" key={props.word}>{word}</Form.Label> 
                 <Form.Control size="lg" type="text" placeholder={placeHolder} onChange={inputKeyUp} value={key}/>
                 <dov>No of Attempt left: { props.settings.numberOfAttempt - attempt } </dov>
-                <Button className="button bg-info"  onClick={() => {speakIt(true)}}>Speak</Button>
+                <Button className="button bg-info"  onClick={() => {speakNow(true)}}>Speak</Button>
             </Card>
         </Collapse>
     );
