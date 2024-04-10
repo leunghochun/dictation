@@ -91,8 +91,8 @@ const Speech = () => {
         setNumberOfWord(e.target.value);
     }
     
-    const batchSelected = (batch) => {
-        setSelectedGroup(batch);
+    const batchSelected = (year, batch) => {
+        setSelectedGroup(year + batch);
     }
 
     const voiceChanged = (selectedVoice) => {
@@ -118,7 +118,8 @@ const Speech = () => {
                         i++;
                     }
                 }
-                setSelectedGroup(Object.keys(newWordList[Object.keys(newWordList)[0]]["words"])[0]);
+                let firstKey = Object.keys(newWordList)[0];
+                batchSelected(newWordList[firstKey]["year"], Object.keys(newWordList[firstKey]["words"])[0]);
                 return newWordList;
         });
     }
@@ -148,7 +149,6 @@ const Speech = () => {
     };
 
     const setYearStarted = (year, batch, started) => {
-        console.log("setYearStarted:", year, batch, started);
         if (wordList) {
             wordList[year]["batch"] = started ? batch : "";
             if (!started) {
@@ -167,7 +167,6 @@ const Speech = () => {
 
     useEffect(() => {
         const localSettings = JSON.parse(localStorage.getItem("settings"));
-        // generateWordList(wordData);
         if (localSettings) {
             setSettings(localSettings);
         }
@@ -228,14 +227,14 @@ const Speech = () => {
                                     {
                                         Object.keys(wordList[year]["words"]).map((batch) => {
                                         return (
-                                            <ListGroup.Item key={year + batch} action href={"#" + year + batch} onClick={() => batchSelected(year + batch)}>
+                                            <ListGroup.Item key={year + batch} action href={"#" + year + batch} onClick={() => batchSelected(year,  batch)}>
                                                 <Batch words={wordList[year]["words"][batch]} 
                                                         settings={settings}
                                                         setCorrectWord={setCorrectWord} 
                                                         setYearStarted={setYearStarted}
                                                         year={year}
                                                         batch={batch}
-                                                        isShow={batch === wordList[year]["batch"]}
+                                                        isShow={year + batch === selectedGroup ? true : false}
                                                 />
                                            </ListGroup.Item>
                                             )

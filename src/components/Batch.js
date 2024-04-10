@@ -45,12 +45,6 @@ const Batch = (props) => {
         if (index < 0) return;
     }, [index]);
 
-    // React.useEffect
-
-    // React.useEffect(()=>{
-    //     props.setYearStarted(props.year, props.batch, started);
-    // }, [props, started]);
-
     const initWords = () => {
         let i = 0;
         props.words.forEach((word) => {
@@ -79,8 +73,6 @@ const Batch = (props) => {
     };
 
     React.useEffect(() => {
-        if (Object.keys(wordList).length > 0) return;
-
         setCorrectWords([]);
         initWords();
     }, [props.words]);
