@@ -5,7 +5,11 @@ import Badge from 'react-bootstrap/Badge';
 
 import Spell from "./Spell";
 
+import { useSpeechSynthesis } from "react-speech-kit";
+
 const Batch = (props) => {
+    const { speak } = useSpeechSynthesis();
+
     const [ index, setIndex ] = React.useState(-1);
     const [ started, setStarted ] = React.useState(false);
     const [ correctWords, setCorrectWords ] = React.useState([]);
@@ -88,7 +92,7 @@ const Batch = (props) => {
                                 return <Form.Label className={`word-tested-${wordList[word].isCorrect ? "correct" : "incorrect"} word`} key={word}>{word}</Form.Label> 
                             })
                         }
-                        <Spell word={currentWord} settings={props.settings} setCorrectWord={setCorrectWord}/>
+                        <Spell word={currentWord} settings={props.settings} setCorrectWord={setCorrectWord} speak={speak}/>
                         <Button className="button bg-info"  onClick={() => {startClicked(false)}}>Stop</Button>
                         <Button className="button bg-info"  onClick={() => {nextClicked()}}>Next</Button> 
                     </>

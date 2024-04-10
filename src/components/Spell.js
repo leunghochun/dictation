@@ -5,10 +5,10 @@ import Collapse from 'react-bootstrap/Collapse';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 
-import { useSpeechSynthesis } from "react-speech-kit";
+// import { useSpeechSynthesis } from "react-speech-kit";
 
 const Spell = (props) => {
-    const { speak } = useSpeechSynthesis();
+    // const { speak } = useSpeechSynthesis();
 
     const [ placeHolder, setPlaceHolder] = React.useState("Please input character");
     const [ key, setKey] = React.useState("");
@@ -24,7 +24,7 @@ const Spell = (props) => {
     const speakInterval = 3;
 
     const speakIt = (isCountAttempt) => {
-        speak({ text: props.word, rate: props.settings.rate ? props.settings.rate : "1"});
+        props.speak({ text: props.word, rate: props.settings.rate ? props.settings.rate : "1"});
         if (isCountAttempt) { 
             setAttempt(attempt + 1);
         }
@@ -104,7 +104,7 @@ const Spell = (props) => {
         return () => {
             clearTimeout(timeout);
         };
-    }, [speak]);
+    }, [counter, props, speakCount, speakIt]);
 
     return (
         <Collapse in={open} dimension="width">
