@@ -12,8 +12,8 @@ import Tesseract from "tesseract.js";
 import Batch from "./components/Batch";
 import wordsJSON from "./words.json";
 
-const Speech = () => {
-    
+const Dictation = () => {
+
     const getSettings = () => {
         const localSettings = JSON.parse(localStorage.getItem("settings"));
         return  localSettings ? localSettings : {};
@@ -235,6 +235,7 @@ const Speech = () => {
                                                         year={year}
                                                         batch={batch}
                                                         isShow={year + batch === selectedGroup ? true : false}
+                                                        speak={speak}
                                                 />
                                            </ListGroup.Item>
                                             )
@@ -280,4 +281,4 @@ const Speech = () => {
         </Accordion>
     );
 };
-export default Speech;
+export default Dictation;
