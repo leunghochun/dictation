@@ -24,6 +24,7 @@ const Batch = (props) => {
     };
 
     const startClicked = (isStarted) => {
+        props.speakIt("start");
         setStarted(isStarted);
         props.setYearStarted(props.year, props.batch, isStarted);
 
