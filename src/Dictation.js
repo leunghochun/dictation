@@ -40,6 +40,7 @@ const Dictation = () => {
     const [text, setText] = React.useState(null);
 
     const speakIt = (text) => {
+        console.log("speak word:", text);
         speak({ text: text, rate: settings.rate ? settings.rate : "1"});
     };
 

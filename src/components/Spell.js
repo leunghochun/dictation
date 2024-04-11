@@ -5,11 +5,7 @@ import Collapse from 'react-bootstrap/Collapse';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 
-// import { useSpeechSynthesis } from "react-speech-kit";
-
 const Spell = (props) => {
-    // const { speak } = useSpeechSynthesis();
-
     const [ placeHolder, setPlaceHolder] = React.useState("Please input character");
     const [ key, setKey] = React.useState("");
     const [ word, setWord] = React.useState("");
@@ -23,13 +19,13 @@ const Spell = (props) => {
 
     const speakInterval = 3;
 
-    const speakNow = (isCountAttempt) => {
+    const speakNow = React.useCallback((isCountAttempt) => {
     // const speakNow = () => {
         props.speakIt(props.word);
         if (isCountAttempt) { 
             setAttempt((prev) => prev + 1);
         }
-    };
+    }, [props]);
 
     const inputKeyUp = (event) =>{
         if (!props.word) return;
@@ -77,7 +73,7 @@ const Spell = (props) => {
         setCounter(0);
         setSpeakCount(0);
         setOpen(true);
-    }, [props.word])
+    }, [props.word]);
     
     const GetProgressBarColor = () => {
         // determine the color of progress bar
@@ -87,9 +83,10 @@ const Spell = (props) => {
         } else {
             return "progress-bar-green";
         }
-    }
+    };
 
     React.useEffect(() => {
+        console.log("useEffect");
         const timeout = setTimeout(() => {
             setCounter(counter + 1);
             if (counter % speakInterval === 0 && speakCount < props.settings.repeatTime) {
@@ -104,7 +101,7 @@ const Spell = (props) => {
         return () => {
             clearTimeout(timeout);
         };
-    }, [counter, props, speakCount]);
+    }, [counter, props, speakCount, speakNow]);
 
     return (
         <Collapse in={open} dimension="width">
