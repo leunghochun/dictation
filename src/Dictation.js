@@ -100,30 +100,30 @@ const Dictation = () => {
         setVoice(selectedVoice);
     }
 
-    const generateWordList = (data) => {
-        if (!data) return;
-        setWordList((oldWordList) => {
-                let newWordList = {};
-                for (let year in data) {
-                    let array = [...data[year].words].sort(() => Math.random() - 0.5);
-                    let i = 1;
-                    newWordList[year] = { "words" : {}, "year": year, "started": false, batch: "" };
-                    while (array.length > 0) {
-                        let key = i.toString();
-                        let batch = array.splice(0, numberOfWord);
-                        newWordList[year]["words"]["Batch" + key] = [];
-                        newWordList[year]["Batch" + key + "NoOfCorrect"] = 0;
-                        batch.forEach((word) => {
-                            newWordList[year]["words"]["Batch" + key].push(word);
-                        })
-                        i++;
-                    }
-                }
-                let firstKey = Object.keys(newWordList)[0];
-                batchSelected(newWordList[firstKey]["year"], Object.keys(newWordList[firstKey]["words"])[0]);
-                return newWordList;
-        });
-    }
+    // const generateWordList = (data) => {
+    //     if (!data) return;
+    //     setWordList((oldWordList) => {
+    //             let newWordList = {};
+    //             for (let year in data) {
+    //                 let array = [...data[year].words].sort(() => Math.random() - 0.5);
+    //                 let i = 1;
+    //                 newWordList[year] = { "words" : {}, "year": year, "started": false, batch: "" };
+    //                 while (array.length > 0) {
+    //                     let key = i.toString();
+    //                     let batch = array.splice(0, numberOfWord);
+    //                     newWordList[year]["words"]["Batch" + key] = [];
+    //                     newWordList[year]["Batch" + key + "NoOfCorrect"] = 0;
+    //                     batch.forEach((word) => {
+    //                         newWordList[year]["words"]["Batch" + key].push(word);
+    //                     })
+    //                     i++;
+    //                 }
+    //             }
+    //             let firstKey = Object.keys(newWordList)[0];
+    //             batchSelected(newWordList[firstKey]["year"], Object.keys(newWordList[firstKey]["words"])[0]);
+    //             return newWordList;
+    //     });
+    // }
 
     const videoConstraints = {
         width: { min: 1920},
@@ -186,7 +186,29 @@ const Dictation = () => {
     },[numberOfAttempt, numberOfWord, rate, repeatTime, selectedGroup, settings, voice, waitTime])
 
     useEffect(() => {
-        generateWordList(wordData);
+        if (!wordData) return;
+        setWordList(() => {
+                let newWordList = {};
+                for (let year in wordData) {
+                    let array = [...wordData[year].words].sort(() => Math.random() - 0.5);
+                    let i = 1;
+                    newWordList[year] = { "words" : {}, "year": year, "started": false, batch: "" };
+                    while (array.length > 0) {
+                        let key = i.toString();
+                        let batch = array.splice(0, numberOfWord);
+                        newWordList[year]["words"]["Batch" + key] = [];
+                        newWordList[year]["Batch" + key + "NoOfCorrect"] = 0;
+                        batch.forEach((word) => {
+                            newWordList[year]["words"]["Batch" + key].push(word);
+                        })
+                        i++;
+                    }
+                }
+                let firstKey = Object.keys(newWordList)[0];
+                batchSelected(newWordList[firstKey]["year"], Object.keys(newWordList[firstKey]["words"])[0]);
+                return newWordList;
+        });
+        // generateWordList(wordData);
     }, [wordData, numberOfWord]);
 
     const onActiveKeyChange = (e) => {
@@ -194,31 +216,8 @@ const Dictation = () => {
     }
 
     return (        
-        <Accordion defaultActiveKey={['1']} alwaysOpen onSelect={(e) => onActiveKeyChange(e)}>
+        <Accordion defaultActiveKey={['0']} alwaysOpen onSelect={(e) => onActiveKeyChange(e)}>
             <Accordion.Item eventKey="0">
-                <Accordion.Header>Settings</Accordion.Header>
-                <Accordion.Body>
-                    <Form.Label>Speed </Form.Label>
-                    <Form.Range value={rate} onChange={rateSliderChange} min="0.5" max="2" step="0.1" />
-                    <Form.Label>Wait time ({waitTime} seconds)</Form.Label>
-                    <Form.Range value={waitTime} onChange={waitTimeSliderChange} min={minWaitTime} max="30" />
-                    <Form.Label>Repeat ({repeatTime} X)</Form.Label>
-                    <Form.Range value={repeatTime} onChange={repeatSliderChange} min="1" max="3" />
-                    <Form.Label>Number of Attempt ({numberOfAttempt})</Form.Label>
-                    <Form.Range value={numberOfAttempt} onChange={(e) => {numberOfAttemptSliderChange(e)}} min="5" max="10" step="1" />
-                    <Form.Label>Number of words({numberOfWord})</Form.Label>
-                    <Form.Range value={numberOfWord} onChange={(e) => {numberOfWordSliderChange(e)}} min="5" max="30" step="5" />
-                    <Form.Label>Voice</Form.Label>
-                    {voiceList.map((item) => {
-                        return <div key={ "div" + item.name + item.value } className="flexLayout">
-                                <Form.Check key={"voice" + item.name + item.value} value={item.value} type="radio" label={item.name} onChange={() => voiceChanged(item.value)} checked={item.value === voice} />
-                                <Button key={"button" + item.name +item.value} className="linkButton" variant="link" onClick={() => {triggerSpeakTest(item)}}>Test</Button>
-                            </div>
-                        })
-                    }
-                </Accordion.Body> 
-            </Accordion.Item>
-            <Accordion.Item eventKey="1">
                 <Accordion.Header>Batches</Accordion.Header>
                 <Accordion.Body>
                     <Tabs key="tabs">
@@ -246,6 +245,29 @@ const Dictation = () => {
                             </Tab>
                         })}
                     </Tabs>
+                </Accordion.Body> 
+            </Accordion.Item>
+            <Accordion.Item eventKey="1">
+                <Accordion.Header>Settings</Accordion.Header>
+                <Accordion.Body>
+                    <Form.Label>Speed </Form.Label>
+                    <Form.Range value={rate} onChange={rateSliderChange} min="0.5" max="2" step="0.1" />
+                    <Form.Label>Wait time ({waitTime} seconds)</Form.Label>
+                    <Form.Range value={waitTime} onChange={waitTimeSliderChange} min={minWaitTime} max="30" />
+                    <Form.Label>Repeat ({repeatTime} X)</Form.Label>
+                    <Form.Range value={repeatTime} onChange={repeatSliderChange} min="1" max="3" />
+                    <Form.Label>Number of Attempt ({numberOfAttempt})</Form.Label>
+                    <Form.Range value={numberOfAttempt} onChange={(e) => {numberOfAttemptSliderChange(e)}} min="5" max="10" step="1" />
+                    <Form.Label>Number of words({numberOfWord})</Form.Label>
+                    <Form.Range value={numberOfWord} onChange={(e) => {numberOfWordSliderChange(e)}} min="5" max="30" step="5" />
+                    <Form.Label>Voice</Form.Label>
+                    {voiceList.map((item) => {
+                        return <div key={ "div" + item.name + item.value } className="flexLayout">
+                                <Form.Check key={"voice" + item.name + item.value} value={item.value} type="radio" label={item.name} onChange={() => voiceChanged(item.value)} checked={item.value === voice} />
+                                <Button key={"button" + item.name +item.value} className="linkButton" variant="link" onClick={() => {triggerSpeakTest(item)}}>Test</Button>
+                            </div>
+                        })
+                    }
                 </Accordion.Body> 
             </Accordion.Item>
             <Accordion.Item eventKey="2">

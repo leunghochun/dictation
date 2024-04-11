@@ -10,10 +10,10 @@ const Spell = (props) => {
     const [ key, setKey] = React.useState("");
     const [ word, setWord] = React.useState("");
     const [ attempt, setAttempt] = React.useState(0);
-    const [ isCorrect, setIsCorrect ] = React.useState(false);
+    // const [ isCorrect, setIsCorrect ] = React.useState(false);
     const [ open, setOpen] = React.useState(false);
 
-    const [ countOfProgress, setCountOfProgress ] = React.useState(0);
+    // const [ countOfProgress, setCountOfProgress ] = React.useState(0);
     const [ counter, setCounter ] = React.useState(0);
     const [ speakCount, setSpeakCount] = React.useState(0);
 
@@ -68,8 +68,8 @@ const Spell = (props) => {
         setWord("");
         setKey("");
         setAttempt(0);
-        setCountOfProgress(0);
-        setIsCorrect(false);
+        // setCountOfProgress(0);
+        // setIsCorrect(false);
         setCounter(0);
         setSpeakCount(0);
         setOpen(true);

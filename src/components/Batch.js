@@ -10,7 +10,7 @@ const Batch = (props) => {
 
     const [ index, setIndex ] = React.useState(-1);
     const [ started, setStarted ] = React.useState(false);
-    const [ correctWords, setCorrectWords ] = React.useState([]);
+    // const [ correctWords, setCorrectWords ] = React.useState([]);
     const [ wordList, setWordList ] = React.useState({});
     const [ currentWord, setCurrentWord ] = React.useState(null); 
 
@@ -39,7 +39,7 @@ const Batch = (props) => {
 
         nextWord(word, isCorrect, attemptCompleted);
 
-        setCorrectWords(props.words.filter((word) => wordList[word].isCorrect));
+        // setCorrectWords(props.words.filter((word) => wordList[word].isCorrect));
         props.setCorrectWord(word, isCorrect, props.year, props.batch);
     };
 
@@ -47,7 +47,7 @@ const Batch = (props) => {
         if (index < 0) return;
     }, [index]);
 
-    const initWords = () => {
+    const initWords = React.useCallback(() => {
         let i = 0;
         props.words.forEach((word) => {
             wordList[word] = { 
@@ -59,7 +59,7 @@ const Batch = (props) => {
             i++;
         });
         setCurrentWord(props.words[0]);
-    };
+    }, [props.words, wordList]);
 
     const nextWord = (word, isCorrect, attemptCompleted) => {
         wordList[word].isCorrect = isCorrect;
@@ -75,9 +75,9 @@ const Batch = (props) => {
     };
 
     React.useEffect(() => {
-        setCorrectWords([]);
+        // setCorrectWords([]);
         initWords();
-    }, [props.words]);
+    }, [initWords, props.words]);
 
     return (
         <>
